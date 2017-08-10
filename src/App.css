@@ -1,0 +1,19 @@
+button {
+  padding: 0;
+}
+
+div {
+  margin-bottom: -4px;
+}
+
+.board {
+  display: flex;
+  justify-content: center;
+}
+
+.tile {
+  display: inline-block;
+  border: 1px solid black;
+  width: 32px;
+  height: 32px;
+}
