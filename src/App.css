@@ -11,9 +11,17 @@ div {
   justify-content: center;
 }
 
-.tile {
+.square {
   display: inline-block;
   border: 1px solid black;
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
+}
+
+.selected {
+  background-color: green;
+}
+
+.highlighted {
+  background-color: yellow;
 }
