@@ -12,10 +12,24 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-jest": "^21.0.2",
+    "babel-preset-env": "^1.6.0",
+    "enzyme": "^2.9.1",
+    "jest": "^21.0.2",
+    "jest-enzyme": "^3.8.2",
+    "react-dom": "^15.6.1",
+    "react-test-renderer": "^15.6.1",
     "redux-devtools": "^3.4.0"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "coverageDirectory": "./test/coverage",
+    "verbose": true
   }
 }
