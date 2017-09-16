@@ -3,18 +3,18 @@ import ChessUtils, { UP, LEFT, RIGHT, DOWN } from '../../ChessUtils';
 
 export default class Bishop extends Piece {
 
-    constructor(player) {
-        super('bishop', player);
-    }
+  constructor(player) {
+    super('bishop', player);
+  }
 
-    getValidMoves(board, position) {
+  getValidMoves(board, position) {
 
-        const directions = [
-            UP | LEFT,
-            UP | RIGHT,
-            DOWN | LEFT,
-            DOWN | RIGHT,
-        ];
-        return ChessUtils.getValidMovesInDirections(board, position, directions, this.player);
-    }
+    const directions = [
+      UP | LEFT,
+      UP | RIGHT,
+      DOWN | LEFT,
+      DOWN | RIGHT,
+    ];
+    return ChessUtils.getValidMovesInDirections(board, position, directions, this.player);
+  }
 }

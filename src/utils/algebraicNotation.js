@@ -19,9 +19,9 @@ export function parseAlgebraicNotation(algebraicNotation) {
 
   // Ignore pawn origin file if capturing
   if (pieceType === 'pawn' && (
-      isCaptureNotation(algebraicNotation, position + 1) ||
+    isCaptureNotation(algebraicNotation, position + 1) ||
       isNaN(algebraicNotation.charAt(position + 1))
-    )) {
+  )) {
     position++;
   }
 
@@ -63,4 +63,4 @@ export function parseAlgebraicNotation(algebraicNotation) {
 const isCaptureNotation = (algebraicNotation, position) => {
   const character = algebraicNotation.charAt(position);
   return character === 'x' || character === ':';
-}
+};

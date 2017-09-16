@@ -4,9 +4,9 @@ import selectedSquare from './selection';
 import validMoveSquares from './validMoves';
 
 const darkChessApp = combineReducers({
-    board,
-    selectedSquare,
-    validMoveSquares,
+  board,
+  selectedSquare,
+  validMoveSquares,
 });
 
 export default darkChessApp;
