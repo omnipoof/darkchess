@@ -1,6 +1,18 @@
-import { parseAlgebraicNotation } from '../../src/utils/algebraicNotation';
+import parseAlgebraicNotation from '../../src/utils/algebraicNotation';
 
 describe('Algebraic Notation', () => {
+
+  describe('Player Determination', () => {
+    it('Test white player default', () => {
+      const parseResults = parseAlgebraicNotation('a1');
+      expect(parseResults.player).toBe('white');
+    });
+
+    it('Test black player notation', () => {
+      const parseResults = parseAlgebraicNotation('...a1');
+      expect(parseResults.player).toBe('black');
+    });
+  });
 
   describe('Piece Notation', () => {
     it('Test pawn notation', () => {
@@ -95,7 +107,7 @@ describe('Algebraic Notation', () => {
           expect(parseResults.file).toBe(file);
           expect(parseResults.rank).toBe(rank);
           expect(parseResults.fileIndex).toBe(fileIndex);
-          expect(parseResults.rankIndex).toBe(rankIndex);
+          expect(parseResults.rankIndex).toBe(8 - rank);
         }
       }
     });

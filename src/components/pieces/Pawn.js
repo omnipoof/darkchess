@@ -1,5 +1,11 @@
 import Piece from './Piece';
-import ChessUtils, { UP, LEFT, RIGHT, DOWN } from '../../ChessUtils';
+import {
+  UP,
+  LEFT,
+  RIGHT,
+  DOWN,
+  getAdjacentPosition,
+} from '../../utils/boardUtils';
 
 export default class Pawn extends Piece {
 
@@ -11,59 +17,53 @@ export default class Pawn extends Piece {
     };
   }
 
+  setHasMoved() {
+    this.state = {
+      hasMoved: true,
+    }
+  }
+
   getValidMoves(board, position) {
+
+    const getPiece = (position) => {
+      const { fileIndex, rankIndex } = position;
+      return board[fileIndex][rankIndex].piece;
+    }
+
+    const isPositionOccupied = (position) => {
+      return getPiece(position) !== null;
+    };
+
+    const isPositionOccupiedByOpponent = (position) => {
+      const piece = getPiece(position);
+      return piece && piece.player !== this.player;
+    };
         
-    const isPositionEmpty = (position) => { // MOVE TO CHESSUTILS
-
-      if (ChessUtils.isPositionOnBoard(position)) {
-        const square = board[position.column][position.row];
-        return square.piece === null;
-      }
-
-      return false;
-    };
-
-    const isPositionOccupiedByOpponent = (position, currentPlayer) => { // MOVE TO CHESSUTILS
-
-      if (ChessUtils.isPositionOnBoard(position)) {
-        const square = board[position.column][position.row];
-        return square.piece !== null && square.piece.player !== currentPlayer;
-      }
-    };
-
     const { hasMoved } = this.state;
-    const newPositions = [];
     const verticalDirection = this.player === 'black' ? DOWN : UP;
-    let validMoves = [];
+    const validMoves = [];
 
     // Check if moving one square is possible
-    let nextPosition = ChessUtils.getAdjacentPosition(position, verticalDirection);
-    if (nextPosition && isPositionEmpty(nextPosition)) {
+    let nextPosition = getAdjacentPosition(position, verticalDirection);
+    if (nextPosition && !isPositionOccupied(nextPosition)) {
       validMoves.push(nextPosition);
       // Check if a two square initial move is possible
-      nextPosition = ChessUtils.getAdjacentPosition(nextPosition, verticalDirection);
-      if (!hasMoved && isPositionEmpty(nextPosition)) {
+      nextPosition = getAdjacentPosition(nextPosition, verticalDirection);
+      if (!hasMoved && !isPositionOccupied(nextPosition)) {
         validMoves.push(nextPosition);
       }
     }
 
     // Check if the pawn can capture diagonally
-    nextPosition = ChessUtils.getAdjacentPosition(position, LEFT | verticalDirection);
-    if (nextPosition && isPositionOccupiedByOpponent(nextPosition, this.player)) {
+    nextPosition = getAdjacentPosition(position, LEFT | verticalDirection);
+    if (nextPosition && isPositionOccupiedByOpponent(nextPosition)) {
       validMoves.push(nextPosition);
     }
 
-    nextPosition = ChessUtils.getAdjacentPosition(position, RIGHT | verticalDirection);
-    if (nextPosition && isPositionOccupiedByOpponent(nextPosition, this.player)) {
+    nextPosition = getAdjacentPosition(position, RIGHT | verticalDirection);
+    if (nextPosition && isPositionOccupiedByOpponent(nextPosition)) {
       validMoves.push(nextPosition);
     }
-
-    newPositions.forEach((newPosition) => {
-      if (ChessUtils.isPositionOnBoard(newPosition) &&
-                ChessUtils.isPositionLandable(board, newPosition, this.player)) {
-        validMoves.push(newPosition);
-      }
-    });
 
     return validMoves;
   }

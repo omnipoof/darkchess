@@ -1,5 +1,7 @@
 import Piece from './Piece';
-import ChessUtils from '../../ChessUtils';
+import {
+  isPositionLandable,
+} from '../../utils/boardUtils';
 
 export default class Knight extends Piece {
 
@@ -9,22 +11,21 @@ export default class Knight extends Piece {
 
   getValidMoves(board, position) {
 
-    const { column, row } = position;
+    const { fileIndex, rankIndex } = position;
     const newPositions = [
-      { column: column + 2, row: row - 1 },
-      { column: column + 2, row: row + 1 },
-      { column: column - 2, row: row - 1 },
-      { column: column - 2, row: row + 1 },
-      { column: column + 1, row: row - 2 },
-      { column: column + 1, row: row + 2 },
-      { column: column - 1, row: row - 2 },
-      { column: column - 1, row: row + 2 },
+      { fileIndex: fileIndex + 2, rankIndex: rankIndex - 1 },
+      { fileIndex: fileIndex + 2, rankIndex: rankIndex + 1 },
+      { fileIndex: fileIndex - 2, rankIndex: rankIndex - 1 },
+      { fileIndex: fileIndex - 2, rankIndex: rankIndex + 1 },
+      { fileIndex: fileIndex + 1, rankIndex: rankIndex - 2 },
+      { fileIndex: fileIndex + 1, rankIndex: rankIndex + 2 },
+      { fileIndex: fileIndex - 1, rankIndex: rankIndex - 2 },
+      { fileIndex: fileIndex - 1, rankIndex: rankIndex + 2 },
     ];
     const validMoves = [];
 
     newPositions.forEach((newPosition) => {
-      if (ChessUtils.isPositionOnBoard(newPosition) &&
-                ChessUtils.isPositionLandable(board, newPosition, this.player)) {
+      if (isPositionLandable(board, newPosition, this.player)) {
         validMoves.push(newPosition);
       }
     });

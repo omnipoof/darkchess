@@ -1,5 +1,11 @@
 import Piece from './Piece';
-import ChessUtils, { UP, LEFT, RIGHT, DOWN } from '../../ChessUtils';
+import {
+  UP,
+  LEFT,
+  RIGHT,
+  DOWN,
+  getValidMovesInDirections,
+} from '../../utils/boardUtils';
 
 export default class King extends Piece {
 
@@ -19,6 +25,6 @@ export default class King extends Piece {
       DOWN,
       DOWN | RIGHT,
     ];
-    return ChessUtils.getValidMovesInDirections(board, position, directions, this.player, false);
+    return getValidMovesInDirections(board, position, directions, this.player, false);
   }
 }

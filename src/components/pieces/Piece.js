@@ -13,7 +13,7 @@ class Piece {
 
   enforceMethodAbstraction(methodName) {
     if (this[methodName] === undefined) {
-      throw new TypeError(methodName + ' is an abstract method and must be implemented.');
+      throw new TypeError(`${ methodName } is an abstract method and must be implemented.`);
     }
   }
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 
 const getIcon = (piece) => {
-  return require('../images/pieces/' + piece.player + '/' + piece.type + '.svg');
+  return require(`../images/pieces/${ piece.player }/${ piece.type }.svg`);
 };
 
 const Square = ({

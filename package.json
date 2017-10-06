@@ -31,7 +31,6 @@
   },
   "jest": {
     "collectCoverage": true,
-    "coverageDirectory": "./test/coverage",
-    "verbose": true
+    "coverageDirectory": "./test/coverage"
   }
 }

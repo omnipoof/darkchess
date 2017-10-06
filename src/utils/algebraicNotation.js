@@ -6,8 +6,14 @@ const pieceTypeMap = {
   Q: 'queen',
 };
 
-export function parseAlgebraicNotation(algebraicNotation) {
+export default function parseAlgebraicNotation(algebraicNotation) {
+
   let position = 0;
+  let player = 'white';
+  if (algebraicNotation.startsWith('...')) {
+    player = 'black';
+    position += 3;
+  }
 
   // Determine piece type
   let pieceType = 'pawn';
@@ -37,8 +43,8 @@ export function parseAlgebraicNotation(algebraicNotation) {
   position++;
 
   // Determine rank
-  const rank = parseInt(algebraicNotation.charAt(position));
-  const rankIndex = rank - 1;
+  const rank = parseInt(algebraicNotation.charAt(position), 10);
+  const rankIndex = 8 - rank;
   position++;
 
   // Determine if capture occuring
@@ -50,6 +56,7 @@ export function parseAlgebraicNotation(algebraicNotation) {
   const isEnPassantCapture = algebraicNotation.endsWith('e.p.');
 
   return {
+    player,
     pieceType,
     isCapture,
     isEnPassantCapture,
