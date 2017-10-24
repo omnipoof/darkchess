@@ -5,18 +5,18 @@ class Board extends Component {
 
     reflectBoard = (board) => {
 
-        let column, row;
+        let fileIndex, rankIndex;
         const newBoard = Array(8);
-        for (column = 0; column < 8; column++) {
-            newBoard[column] = Array(8);
-            for (row = 0; row < 8; row++) {
-                newBoard[column][row] = null;
+        for (fileIndex = 0; fileIndex < 8; fileIndex++) {
+            newBoard[fileIndex] = Array(8);
+            for (rankIndex = 0; rankIndex < 8; rankIndex++) {
+                newBoard[fileIndex][rankIndex] = null;
             }
         }
 
-        for (column = 0; column < 8; column++) {
-            for (row = 0; row < 8; row++) {
-                newBoard[row][column] = board[column][row];
+        for (fileIndex = 0; fileIndex < 8; fileIndex++) {
+            for (rankIndex = 0; rankIndex < 8; rankIndex++) {
+                newBoard[rankIndex][fileIndex] = board[fileIndex][rankIndex];
             }
         }
 
@@ -27,7 +27,7 @@ class Board extends Component {
         const { validMoveSquares } = this.props;
         for (let i = 0; i < validMoveSquares.length; i++) {
             const validMoveSquare = validMoveSquares[i];
-            if (validMoveSquare.column === square.column && validMoveSquare.row === square.row) {
+            if (validMoveSquare.fileIndex === square.fileIndex && validMoveSquare.rankIndex === square.rankIndex) {
                 return true;
             }
         }
@@ -36,26 +36,31 @@ class Board extends Component {
     }
     
     render() {
-        const { board, selectedSquare, onSelectSquare } = this.props;
+        const { board, selectedSquare, currentPlayer, onSelectSquare } = this.props;
         let counter = 0;
         return (
             <div>
-                {
-                    this.reflectBoard(board).map(row =>
-                        <div key={counter++}>
-                            {row.map((square) =>
-                                <Square
-                                    key={counter++}
-                                    board={ board }
-                                    square={ square }
-                                    isSelected={ selectedSquare && square.column === selectedSquare.column && square.row === selectedSquare.row }
-                                    isHighlighted={ this.isValidMoveSquare(square) }
-                                    onSelectSquare={ () => onSelectSquare(board, selectedSquare, square) }
-                                />
-                            )}
-                        </div>
-                    )
-                }
+                <div>
+                    <h1>Current Player: { currentPlayer === 'white' ? 'White' : 'Black' }</h1>
+                </div>
+                <div>
+                    {
+                        this.reflectBoard(board).map(rank =>
+                            <div key={counter++}>
+                                {rank.map((square) =>
+                                    <Square
+                                        key={counter++}
+                                        board={ board }
+                                        square={ square }
+                                        isSelected={ selectedSquare && square.fileIndex === selectedSquare.fileIndex && square.rankIndex === selectedSquare.rankIndex }
+                                        isHighlighted={ this.isValidMoveSquare(square) }
+                                        onSelectSquare={ () => onSelectSquare(board, selectedSquare, square) }
+                                    />
+                                )}
+                            </div>
+                        )
+                    }
+                </div>
             </div>
         )
     }

@@ -4,48 +4,59 @@ import Knight from '../components/pieces/Knight';
 import Bishop from '../components/pieces/Bishop';
 import Queen from '../components/pieces/Queen';
 import King from '../components/pieces/King';
+import { createInitialBoard } from '../utils/boardUtils';
 
 import { INITIALIZE_BOARD, SELECT_SQUARE } from '../actions';
 
-const getInitializedBoard = () => {
-    
-  const board = Array(8);
-  for (let column = 0; column < 8; column++) {
-    board[column] = Array(8);
-    for (let row = 0; row < 8; row++) {
-      board[column][row] = {
-        piece: null,
-        column,
-        row,
-      };
-    }
+const boardState = (state = {
+  board: createInitialBoard(),
+  selectedSquare: null,
+  validMoveSquares: [],
+  currentPlayer: 'white',
+  history: [],
+}, action) => {
+
+  const { board, selectedSquare, validMoveSquares, currentPlayer } = state;
+  const newState = { board, selectedSquare, validMoveSquares, currentPlayer }
+  switch (action.type) {
+    case INITIALIZE_BOARD:
+      newState.board = createInitialBoard();
+      break;
+    case SELECT_SQUARE:
+      const { board } = state;
+      const { square } = action;
+
+      if (selectedSquare) {
+
+        if (selectedSquare.fileIndex === square.fileIndex && selectedSquare.rankIndex === square.rankIndex) {
+          // If the same square is selected, deselect the square
+          newState.selectedSquare = null;
+          newState.validMoveSquares = [];
+        } else if (selectedSquare.piece && square.piece && selectedSquare.piece.player === square.piece.player) {
+          // If a square with another of the player's pieces is selected, select the square
+          newState.selectedSquare = square;
+          newState.validMoveSquares = getValidMovesFromSquare(board, square);
+        } else if (validMoveSquares.some(validMoveSquare => (
+          square.fileIndex === validMoveSquare.fileIndex && square.rankIndex === validMoveSquare.rankIndex
+        ))) {
+          // If a valid move square is selected, move the piece, deselect the square, and change players
+          square.piece = selectedSquare.piece;
+          selectedSquare.piece = null;
+          if (square.piece.type === 'pawn') {
+            square.piece.setHasMoved();
+          }
+          newState.selectedSquare = null;
+          newState.validMoveSquares = [];
+          newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+        }
+      } else if (square.piece && currentPlayer === square.piece.player) {
+        newState.selectedSquare = square;
+        newState.validMoveSquares = getValidMovesFromSquare(board, square);
+      }
+      break;
   }
 
-  board[0][1].piece = new Rook('black');
-  board[1][0].piece = new Knight('black');
-  board[2][0].piece = new Bishop('black');
-  board[3][0].piece = new King('black');
-  board[4][0].piece = new Queen('black');
-  board[5][0].piece = new Bishop('black');
-  board[6][0].piece = new Knight('black');
-  board[7][1].piece = new Rook('black');
-  // for (let i = 0; i < 8; i++) {
-  board[1][2].piece = new Pawn('black');
-  board[5][4].piece = new Pawn('black');
-  board[2][3].piece = new Pawn('white');
-  board[5][5].piece = new Pawn('white');
-  board[6][5].piece = new Pawn('white');
-  // }
-  board[0][6].piece = new Rook('white');
-  board[1][7].piece = new Knight('white');
-  board[2][7].piece = new Bishop('white');
-  board[3][7].piece = new King('white');
-  board[4][7].piece = new Queen('white');
-  board[5][7].piece = new Bishop('white');
-  board[6][7].piece = new Knight('white');
-  board[7][6].piece = new Rook('white');
-
-  return board;
+  return newState;
 };
 
 const updateBoardPositions = (action) => {
@@ -59,16 +70,21 @@ const updateBoardPositions = (action) => {
   return board;
 };
 
-const board = (board = getInitializedBoard(), action) => {
-
-  switch (action.type) {
-  case INITIALIZE_BOARD:
-    return getInitializedBoard();
-  case SELECT_SQUARE:
-    return updateBoardPositions(action);
-  default:
-    return board;
+const toggleSquareSelection = (selectedSquare, square) => {
+  if (selectedSquare && selectedSquare.column === square.column && selectedSquare.row === square.row) {
+    return null;
   }
+
+  if (square.piece === null) {
+    return null;
+  }
+
+  return square;
 };
 
-export default board;
+const getValidMovesFromSquare = (board, square) => {
+  const piece = square.piece;
+  return piece ? piece.getValidMoves(board, square) : [];
+};
+
+export default boardState;

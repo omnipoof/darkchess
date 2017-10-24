@@ -52,12 +52,12 @@ describe('Board Utils', () => {
 
       piece = board[3][0].piece;
       expect(piece).not.toBeNull();
-      expect(piece.type).toBe('king');
+      expect(piece.type).toBe('queen');
       expect(piece.player).toBe('black');
 
       piece = board[4][0].piece;
       expect(piece).not.toBeNull();
-      expect(piece.type).toBe('queen');
+      expect(piece.type).toBe('king');
       expect(piece.player).toBe('black');
 
       piece = board[5][0].piece;
@@ -104,12 +104,12 @@ describe('Board Utils', () => {
 
       piece = board[3][7].piece;
       expect(piece).not.toBeNull();
-      expect(piece.type).toBe('king');
+      expect(piece.type).toBe('queen');
       expect(piece.player).toBe('white');
 
       piece = board[4][7].piece;
       expect(piece).not.toBeNull();
-      expect(piece.type).toBe('queen');
+      expect(piece.type).toBe('king');
       expect(piece.player).toBe('white');
 
       piece = board[5][7].piece;

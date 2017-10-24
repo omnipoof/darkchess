@@ -1,12 +1,8 @@
 import { combineReducers } from 'redux';
-import board from './board';
-import selectedSquare from './selection';
-import validMoveSquares from './validMoves';
+import boardState from './board';
 
 const darkChessApp = combineReducers({
-  board,
-  selectedSquare,
-  validMoveSquares,
+  boardState,
 });
 
 export default darkChessApp;

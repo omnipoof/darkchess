@@ -2,22 +2,20 @@ import { connect } from 'react-redux';
 import { selectSquare } from '../actions';
 import BoardComponent from '../components/board';
 
-const getBoard = (board) => {
-    return board;
-}
-
 const mapStateToProps = (state) => {
+    const { boardState: { board, selectedSquare, validMoveSquares, currentPlayer } } = state;
     return {
-        board: state.board,
-        selectedSquare: state.selectedSquare,
-        validMoveSquares: state.validMoveSquares,
+        board,
+        selectedSquare,
+        validMoveSquares,
+        currentPlayer,
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onSelectSquare: (board, previousSelectedSquare, square) => {
-            dispatch(selectSquare(board, previousSelectedSquare, square));
+        onSelectSquare: (board, previousSelectedSquare, square, currentPlayer) => {
+            dispatch(selectSquare(board, previousSelectedSquare, square, currentPlayer));
         }
     }
 }

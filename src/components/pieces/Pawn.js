@@ -13,7 +13,6 @@ export default class Pawn extends Piece {
     super('pawn', player);
     this.state = {
       hasMoved: false,
-      movedTwoSquaresInitially: false,
     };
   }
 
