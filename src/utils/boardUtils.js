@@ -1,4 +1,4 @@
-import parseAlgebraicNotation from './algebraicNotation';
+import { parseAlgebraicNotation } from './algebraicNotation';
 import Pawn from '../components/pieces/Pawn';
 import Rook from '../components/pieces/Rook';
 import Knight from '../components/pieces/Knight';

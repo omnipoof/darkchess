@@ -1,6 +1,9 @@
-import parseAlgebraicNotation from '../../src/utils/algebraicNotation';
+import {
+  parseAlgebraicNotation,
+  writeAlgebraicNotation,
+} from '../../src/utils/algebraicNotation';
 
-describe('Algebraic Notation', () => {
+describe('Parsing Algebraic Notation', () => {
 
   describe('Player Determination', () => {
     it('Test white player default', () => {
@@ -74,6 +77,7 @@ describe('Algebraic Notation', () => {
       expect(parseResults.isCapture).toBeTruthy();
       expect(parseResults.file).toBe('d');
       expect(parseResults.rank).toBe(5);
+      expect(parseResults.previousFileIndex).toBe(4);
     });
 
     it('Test pawn piece \':\' suffix capture notation', () => {
@@ -81,14 +85,16 @@ describe('Algebraic Notation', () => {
       expect(parseResults.isCapture).toBeTruthy();
       expect(parseResults.file).toBe('d');
       expect(parseResults.rank).toBe(5);
+      expect(parseResults.previousFileIndex).toBe(4);
     });
 
     it('Test en passant capture notation', () => {
       const parseResults = parseAlgebraicNotation('exd5e.p.');
       expect(parseResults.isCapture).toBeTruthy();
+      expect(parseResults.isEnPassantCapture).toBeTruthy();
       expect(parseResults.file).toBe('d');
       expect(parseResults.rank).toBe(5);
-      expect(parseResults.isEnPassantCapture).toBeTruthy();
+      expect(parseResults.previousFileIndex).toBe(4);
     });
 
     it('Test non-capture notation', () => {
@@ -111,5 +117,110 @@ describe('Algebraic Notation', () => {
         }
       }
     });
+  });
+});
+
+describe('Writing Algebraic Notation', () => {
+  describe('Writing Non-Pawn Algebraic Notation', () => {
+    it('Test basic notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        pieceType: 'bishop',
+        fileIndex: 4,
+        rankIndex: 4,
+      });
+      expect(writeResults).toBe('Be4');
+    });
+
+    it('Test black player notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'black',
+        pieceType: 'bishop',
+        fileIndex: 4,
+        rankIndex: 4,
+      });
+      expect(writeResults).toBe('...Be4');
+    });
+
+    it('Test capture notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        pieceType: 'bishop',
+        fileIndex: 4,
+        rankIndex: 4,
+        isCapture: true,
+      });
+      expect(writeResults).toBe('Bxe4');
+    });
+  });
+
+  describe('Writing Pawn Algebraic Notation', () => {
+    it('Test basic notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        pieceType: 'pawn',
+        fileIndex: 4,
+        rankIndex: 4,
+      });
+      expect(writeResults).toBe('e4');
+    });
+
+    it('Test pawn capture notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        pieceType: 'pawn',
+        fileIndex: 4,
+        rankIndex: 4,
+        isCapture: true,
+        previousFileIndex: 3,
+      });
+      expect(writeResults).toBe('dxe4');
+    });
+
+    it('Test en passant pawn capture notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        pieceType: 'pawn',
+        fileIndex: 4,
+        rankIndex: 4,
+        isCapture: true,
+        isEnPassantCapture: true,
+        previousFileIndex: 3,
+      });
+      expect(writeResults).toBe('dxe4e.p.');
+    });
+  });
+});
+
+describe('Parsing and Writing Algebraic Notation', () => {
+  it('Test restoring board positions', () => {
+    for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
+      for (let rankIndex = 0; rankIndex < 8; rankIndex++) {
+        const file = String.fromCharCode('a'.charCodeAt(0) + fileIndex);
+        const rank = rankIndex + 1;
+        const position = file.concat(rank);
+        expect(writeAlgebraicNotation(parseAlgebraicNotation(position))).toBe(position);
+      }
+    }
+  });
+
+  it('Test restoring black piece notation', () => {
+    expect(writeAlgebraicNotation(parseAlgebraicNotation('...Ba8'))).toBe('...Ba8');
+  });
+
+  it('Test restoring non-pawn piece position', () => {
+    expect(writeAlgebraicNotation(parseAlgebraicNotation('Ba8'))).toBe('Ba8');
+  });
+
+  it('Test restoring capture notation', () => {
+    expect(writeAlgebraicNotation(parseAlgebraicNotation('Bxa8'))).toBe('Bxa8');
+  });
+
+  it('Test restoring pawn capture notation', () => {
+    expect(writeAlgebraicNotation(parseAlgebraicNotation('exd4'))).toBe('exd4');
+  });
+
+  it('Test restoring pawn en passant capture notation', () => {
+    expect(writeAlgebraicNotation(parseAlgebraicNotation('exd4e.p.'))).toBe('exd4e.p.');
   });
 });

@@ -1,4 +1,4 @@
-const pieceTypeMap = {
+const pieceLetterToTypeMap = {
   B: 'bishop',
   K: 'king',
   N: 'knight',
@@ -6,7 +6,10 @@ const pieceTypeMap = {
   Q: 'queen',
 };
 
-export default function parseAlgebraicNotation(algebraicNotation) {
+const pieceTypeToLetterMap = {};
+Object.keys(pieceLetterToTypeMap).forEach(key => pieceTypeToLetterMap[pieceLetterToTypeMap[key]] = key);
+
+export function parseAlgebraicNotation(algebraicNotation) {
 
   let position = 0;
   let player = 'white';
@@ -18,16 +21,19 @@ export default function parseAlgebraicNotation(algebraicNotation) {
   // Determine piece type
   let pieceType = 'pawn';
   let character = algebraicNotation.charAt(position);
-  if (Object.keys(pieceTypeMap).some( pieceLetter => pieceLetter === character )) {
-    pieceType = pieceTypeMap[character];
+  if (Object.keys(pieceLetterToTypeMap).some( pieceLetter => pieceLetter === character )) {
+    pieceType = pieceLetterToTypeMap[character];
     position++;
   }
 
-  // Ignore pawn origin file if capturing
+  // Determine pawn origin file if capturing
+  let previousFileIndex = null;
   if (pieceType === 'pawn' && (
     isCaptureNotation(algebraicNotation, position + 1) ||
       isNaN(algebraicNotation.charAt(position + 1))
   )) {
+    const previousFile = algebraicNotation.charAt(position);
+    previousFileIndex = previousFile.charCodeAt(0) - 'a'.charCodeAt(0);
     position++;
   }
 
@@ -64,6 +70,7 @@ export default function parseAlgebraicNotation(algebraicNotation) {
     fileIndex,
     rank,
     rankIndex,
+    previousFileIndex,
   };
 }
 
@@ -71,3 +78,28 @@ const isCaptureNotation = (algebraicNotation, position) => {
   const character = algebraicNotation.charAt(position);
   return character === 'x' || character === ':';
 };
+
+export function writeAlgebraicNotation({
+  player,
+  pieceType,
+  isCapture,
+  isEnPassantCapture,
+  fileIndex,
+  rankIndex,
+  previousFileIndex,
+}) {
+
+  const playerPrefix = player === 'white' ? '' : '...';
+  const file = String.fromCharCode('a'.charCodeAt(0) + fileIndex);
+  const rank = 8 - rankIndex;
+  const captureNotation = isCapture ? 'x' : '';
+
+  if (pieceType === 'pawn') {
+    const previousFile = isCapture ? String.fromCharCode('a'.charCodeAt(0) + previousFileIndex) : '';
+    const enPassantCaptureNotation = isEnPassantCapture ? 'e.p.' : '';
+    return `${ playerPrefix }${ previousFile }${ captureNotation }${ file }${ rank }${ enPassantCaptureNotation }`;
+  } else {
+    const pieceLetter = pieceTypeToLetterMap[pieceType];
+    return `${ playerPrefix }${ pieceLetter }${ captureNotation }${ file }${ rank }`;
+  }
+}
