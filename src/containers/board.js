@@ -3,12 +3,13 @@ import { selectSquare } from '../actions';
 import BoardComponent from '../components/board';
 
 const mapStateToProps = (state) => {
-    const { boardState: { board, selectedSquare, validMoveSquares, currentPlayer } } = state;
+    const { boardState: { board, selectedSquare, validMoveSquares, currentPlayer, history } } = state;
     return {
         board,
         selectedSquare,
         validMoveSquares,
         currentPlayer,
+        history,
     }
 }
 

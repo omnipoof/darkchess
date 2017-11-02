@@ -5,6 +5,7 @@ import Bishop from '../components/pieces/Bishop';
 import Queen from '../components/pieces/Queen';
 import King from '../components/pieces/King';
 import { createInitialBoard } from '../utils/boardUtils';
+import { writeAlgebraicNotation } from '../utils/algebraicNotation';
 
 import { INITIALIZE_BOARD, SELECT_SQUARE } from '../actions';
 
@@ -16,8 +17,8 @@ const boardState = (state = {
   history: [],
 }, action) => {
 
-  const { board, selectedSquare, validMoveSquares, currentPlayer } = state;
-  const newState = { board, selectedSquare, validMoveSquares, currentPlayer }
+  const { board, selectedSquare, validMoveSquares, currentPlayer, history } = state;
+  const newState = { board, selectedSquare, validMoveSquares, currentPlayer, history }
   switch (action.type) {
     case INITIALIZE_BOARD:
       newState.board = createInitialBoard();
@@ -35,16 +36,30 @@ const boardState = (state = {
         } else if (selectedSquare.piece && square.piece && selectedSquare.piece.player === square.piece.player) {
           // If a square with another of the player's pieces is selected, select the square
           newState.selectedSquare = square;
-          newState.validMoveSquares = getValidMovesFromSquare(board, square);
+          newState.validMoveSquares = getValidMovesFromSquare(board, square, history);
         } else if (validMoveSquares.some(validMoveSquare => (
           square.fileIndex === validMoveSquare.fileIndex && square.rankIndex === validMoveSquare.rankIndex
         ))) {
           // If a valid move square is selected, move the piece, deselect the square, and change players
+          const isCapture = square.piece !== null;
           square.piece = selectedSquare.piece;
           selectedSquare.piece = null;
           if (square.piece.type === 'pawn') {
             square.piece.setHasMoved();
           }
+          
+          newState.history.push({
+            move: writeAlgebraicNotation({
+              player: currentPlayer,
+              pieceType: square.piece.type,
+              fileIndex: square.fileIndex,
+              rankIndex: square.rankIndex,
+              previousFileIndex: selectedSquare.fileIndex,
+              isCapture,
+            }),
+            board,
+          });
+
           newState.selectedSquare = null;
           newState.validMoveSquares = [];
           newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';

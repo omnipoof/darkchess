@@ -36,7 +36,7 @@ class Board extends Component {
     }
     
     render() {
-        const { board, selectedSquare, currentPlayer, onSelectSquare } = this.props;
+        const { board, selectedSquare, currentPlayer, onSelectSquare, history } = this.props;
         let counter = 0;
         return (
             <div>
@@ -59,6 +59,16 @@ class Board extends Component {
                                 )}
                             </div>
                         )
+                    }
+                </div>
+                <div>
+                    <h2>History</h2>
+                    {
+                        history.map(historicalState => (
+                            <div>
+                                { historicalState.move }
+                            </div>
+                        ))
                     }
                 </div>
             </div>
