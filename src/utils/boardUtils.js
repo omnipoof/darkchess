@@ -22,7 +22,7 @@ export const createEmptyBoard = () => {
       board[fileIndex][rankIndex] = {
         piece: null,
         fileIndex,
-        rankIndex: rankIndex,
+        rankIndex,
       };
     }
   }
@@ -71,10 +71,20 @@ export const createInitialBoard = () => {
   ]);
 };
 
+export const cloneBoard = (board) => {
+  return board.map(array => array.slice().map(({ piece, fileIndex, rankIndex }) => (
+    {
+      piece,
+      fileIndex,
+      rankIndex,
+    }
+  )));
+};
+
 export const isPositionOnBoard = (position) => {
   const { fileIndex, rankIndex } = position;
   return fileIndex >= 0 && fileIndex < boardSize && rankIndex >= 0 && rankIndex < boardSize;
-}
+};
 
 export const isPositionLandable = (board, position, currentPlayer) => {
 
@@ -85,7 +95,7 @@ export const isPositionLandable = (board, position, currentPlayer) => {
   }
   
   return false;
-}
+};
 
 export const getAdjacentPosition = (position, direction) => {
 
@@ -96,7 +106,7 @@ export const getAdjacentPosition = (position, direction) => {
   };
 
   return isPositionOnBoard(newPosition) ? newPosition : null;
-}
+};
 
 export const getValidMovesInDirection = (board, currentPosition, direction, currentPlayer, recurse, validMoves) => {
   
@@ -122,4 +132,4 @@ export const getValidMovesInDirections = (board, position, directions, currentPl
   });
 
   return validMoves;
-}
+};

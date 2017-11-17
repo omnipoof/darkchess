@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ObjectID from 'bson-objectid';
 import Square from './square';
 
 class Board extends Component {
@@ -65,7 +66,7 @@ class Board extends Component {
                     <h2>History</h2>
                     {
                         history.map(historicalState => (
-                            <div>
+                            <div key={ ObjectID() }>
                                 { historicalState.move }
                             </div>
                         ))

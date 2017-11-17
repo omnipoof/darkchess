@@ -6,6 +6,10 @@ import {
   DOWN,
   getAdjacentPosition,
 } from '../../utils/boardUtils';
+import {
+  parseAlgebraicNotation,
+  writeAlgebraicNotation,
+} from '../../utils/algebraicNotation';
 
 export default class Pawn extends Piece {
 
@@ -16,13 +20,7 @@ export default class Pawn extends Piece {
     };
   }
 
-  setHasMoved() {
-    this.state = {
-      hasMoved: true,
-    }
-  }
-
-  getValidMoves(board, position) {
+  getValidMoves(board, position, history) {
 
     const getPiece = (position) => {
       const { fileIndex, rankIndex } = position;
@@ -37,6 +35,30 @@ export default class Pawn extends Piece {
       const piece = getPiece(position);
       return piece && piece.player !== this.player;
     };
+
+    const didOpponentMovePawnTwoSquares = (opponentPawn) => {
+      const clonedHistory = history.slice();
+      const { move: lastOpponentMove, board: lastOpponentBoardState } = clonedHistory.pop();
+      const parsedLastMove = parseAlgebraicNotation(lastOpponentMove);
+      // Check if the opponent potentially moved a pawn from its initial position during their last turn
+      if (
+        !parsedLastMove.isCapture
+        && parsedLastMove.pieceType === 'pawn'
+        && parsedLastMove.rankIndex === this.player === 'white' ? 3 : 4
+      ) {
+        clonedHistory.pop(); // Ignore the current player's last move
+        
+        const { board: secondLastOpponentBoardState } = clonedHistory.pop();
+        // Check if the opponent's pawn was in its initial position during their second to last turn
+        const square = secondLastOpponentBoardState[parsedLastMove.fileIndex][this.player === 'white' ? 1 : 6];
+        const lastMovedPawn = lastOpponentBoardState[parsedLastMove.fileIndex][parsedLastMove.rankIndex].piece;
+        const pieceInPawnInitialPosition = square.piece;
+        if (pieceInPawnInitialPosition) {
+          // True if the opponent has a piece in the initial location
+          return lastMovedPawn.id === pieceInPawnInitialPosition.id && lastMovedPawn.id === opponentPawn.id;
+        }
+      }
+    }
         
     const { hasMoved } = this.state;
     const verticalDirection = this.player === 'black' ? DOWN : UP;
@@ -64,6 +86,45 @@ export default class Pawn extends Piece {
       validMoves.push(nextPosition);
     }
 
+    // Check if the pawn can capture en passant
+    nextPosition = getAdjacentPosition(position, LEFT);
+    if (
+      nextPosition
+        && isPositionOccupiedByOpponent(nextPosition)
+        && getPiece(nextPosition).type === 'pawn'
+        && didOpponentMovePawnTwoSquares(getPiece(nextPosition))
+    ) {
+      validMoves.push(getAdjacentPosition(position, LEFT | verticalDirection))
+    }
+
+    nextPosition = getAdjacentPosition(position, RIGHT);
+    if (
+      nextPosition
+        && isPositionOccupiedByOpponent(nextPosition)
+        && getPiece(nextPosition).type === 'pawn'
+        && didOpponentMovePawnTwoSquares(getPiece(nextPosition))
+    ) {
+      validMoves.push(getAdjacentPosition(position, RIGHT | verticalDirection))
+    }
+
     return validMoves;
+  }
+
+  move(board, originSquare, destinationSquare) {
+    const moveInfo = super.move(board, originSquare, destinationSquare);
+    if (!moveInfo.isCapture && originSquare.fileIndex !== destinationSquare.fileIndex) {
+      // An en passant capture occurred because the pawn moved diagonally but did not capture a piece normally
+      moveInfo.isCapture = moveInfo.isEnPassantCapture = true;
+      moveInfo.capturedPiece = board[destinationSquare.fileIndex][originSquare.rankIndex].piece;
+      board[destinationSquare.fileIndex][originSquare.rankIndex].piece = null;
+      moveInfo.board = board;
+      moveInfo.algebraicNotaiton = writeAlgebraicNotation(moveInfo)
+    }
+
+    this.state = {
+      hasMoved: true,
+    }
+
+    return moveInfo;
   }
 }

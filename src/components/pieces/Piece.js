@@ -1,3 +1,6 @@
+import ObjectID from 'bson-objectid';
+import { writeAlgebraicNotation } from '../../utils/algebraicNotation';
+
 class Piece {
 
   constructor(type, player) {
@@ -7,6 +10,7 @@ class Piece {
     }
     this.enforceMethodAbstraction('getValidMoves');
 
+    this.id = ObjectID();
     this.type = type;
     this.player = player;
   }
@@ -15,6 +19,26 @@ class Piece {
     if (this[methodName] === undefined) {
       throw new TypeError(`${ methodName } is an abstract method and must be implemented.`);
     }
+  }
+
+  move(board, originSquare, destinationSquare) {
+    const capturedPiece = destinationSquare.piece;
+    destinationSquare.piece = originSquare.piece;
+    originSquare.piece = null;
+    const moveInfo = {
+      board,
+      player: this.player,
+      piece: this,
+      pieceType: this.type,
+      fileIndex: destinationSquare.fileIndex,
+      rankIndex: destinationSquare.rankIndex,
+      previousFileIndex: originSquare.fileIndex,
+      previousRankIndex: originSquare.rankIndex,
+      capturedPiece,
+      isCapture: capturedPiece,
+    };
+    moveInfo.algebraicNotation = writeAlgebraicNotation(moveInfo);
+    return moveInfo;
   }
 }
 

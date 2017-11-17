@@ -4,8 +4,7 @@ import Knight from '../components/pieces/Knight';
 import Bishop from '../components/pieces/Bishop';
 import Queen from '../components/pieces/Queen';
 import King from '../components/pieces/King';
-import { createInitialBoard } from '../utils/boardUtils';
-import { writeAlgebraicNotation } from '../utils/algebraicNotation';
+import { createInitialBoard, cloneBoard } from '../utils/boardUtils';
 
 import { INITIALIZE_BOARD, SELECT_SQUARE } from '../actions';
 
@@ -18,13 +17,12 @@ const boardState = (state = {
 }, action) => {
 
   const { board, selectedSquare, validMoveSquares, currentPlayer, history } = state;
-  const newState = { board, selectedSquare, validMoveSquares, currentPlayer, history }
+  const newState = { board: cloneBoard(board), selectedSquare, validMoveSquares, currentPlayer, history }
   switch (action.type) {
     case INITIALIZE_BOARD:
       newState.board = createInitialBoard();
       break;
     case SELECT_SQUARE:
-      const { board } = state;
       const { square } = action;
 
       if (selectedSquare) {
@@ -40,33 +38,24 @@ const boardState = (state = {
         } else if (validMoveSquares.some(validMoveSquare => (
           square.fileIndex === validMoveSquare.fileIndex && square.rankIndex === validMoveSquare.rankIndex
         ))) {
-          // If a valid move square is selected, move the piece, deselect the square, and change players
-          const isCapture = square.piece !== null;
-          square.piece = selectedSquare.piece;
-          selectedSquare.piece = null;
-          if (square.piece.type === 'pawn') {
-            square.piece.setHasMoved();
-          }
-          
-          newState.history.push({
-            move: writeAlgebraicNotation({
-              player: currentPlayer,
-              pieceType: square.piece.type,
-              fileIndex: square.fileIndex,
-              rankIndex: square.rankIndex,
-              previousFileIndex: selectedSquare.fileIndex,
-              isCapture,
-            }),
-            board,
-          });
+          // If a valid move square is selected, move the piece, deselect the square, change players, and update the history
+          const moveInfo = selectedSquare.piece.move(
+            newState.board,
+            newState.board[selectedSquare.fileIndex][selectedSquare.rankIndex],
+            newState.board[square.fileIndex][square.rankIndex],
+          );
 
           newState.selectedSquare = null;
           newState.validMoveSquares = [];
           newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+          newState.history.push({
+            move: moveInfo.algebraicNotation,
+            board: newState.board,
+          });
         }
       } else if (square.piece && currentPlayer === square.piece.player) {
         newState.selectedSquare = square;
-        newState.validMoveSquares = getValidMovesFromSquare(board, square);
+        newState.validMoveSquares = getValidMovesFromSquare(board, square, history);
       }
       break;
   }
@@ -97,9 +86,9 @@ const toggleSquareSelection = (selectedSquare, square) => {
   return square;
 };
 
-const getValidMovesFromSquare = (board, square) => {
+const getValidMovesFromSquare = (board, square, history) => {
   const piece = square.piece;
-  return piece ? piece.getValidMoves(board, square) : [];
+  return piece ? piece.getValidMoves(board, square, history) : [];
 };
 
 export default boardState;
