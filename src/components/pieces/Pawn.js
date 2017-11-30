@@ -44,7 +44,7 @@ export default class Pawn extends Piece {
       if (
         !parsedLastMove.isCapture
         && parsedLastMove.pieceType === 'pawn'
-        && parsedLastMove.rankIndex === this.player === 'white' ? 3 : 4
+        && parsedLastMove.rankIndex === (this.player === 'white' ? 3 : 4)
       ) {
         clonedHistory.pop(); // Ignore the current player's last move
         

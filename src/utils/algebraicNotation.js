@@ -82,34 +82,6 @@ export function parseAlgebraicNotation(algebraicNotation) {
   };
 }
 
-const isFileNotation = (character) => {
-  const charCode = character.charCodeAt(0);
-  const aCharCode = 'a'.charCodeAt(0);
-  const hCharCode = 'h'.charCodeAt(0);
-  return charCode >= aCharCode && charCode <= hCharCode;
-}
-
-const isRankNotation = (character) => {
-  const value = parseInt(character, 10);
-  return Number.isInteger && value >= 1 && value <= 8;
-}
-
-const isCaptureNotation = (character) => {
-  return character === 'x';
-};
-
-const parseRank = (character) => {
-  return parseInt(character, 10);
-}
-
-const getFileIndex = (file) => {
-  return file.charCodeAt(0) - 'a'.charCodeAt(0);
-}
-
-const getRankIndex = (rank) => {
-  return 8 - rank;
-}
-
 export function writeAlgebraicNotation({
   player,
   pieceType,
@@ -140,4 +112,32 @@ export function writeAlgebraicNotation({
   }
 
   return algebraicNotation;
+}
+
+const isFileNotation = (character) => {
+  const charCode = character.charCodeAt(0);
+  const aCharCode = 'a'.charCodeAt(0);
+  const hCharCode = 'h'.charCodeAt(0);
+  return charCode >= aCharCode && charCode <= hCharCode;
+}
+
+const isRankNotation = (character) => {
+  const value = parseInt(character, 10);
+  return Number.isInteger && value >= 1 && value <= 8;
+}
+
+const isCaptureNotation = (character) => {
+  return character === 'x';
+};
+
+const parseRank = (character) => {
+  return parseInt(character, 10);
+}
+
+const getFileIndex = (file) => {
+  return file.charCodeAt(0) - 'a'.charCodeAt(0);
+}
+
+const getRankIndex = (rank) => {
+  return 8 - rank;
 }

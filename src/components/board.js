@@ -1,28 +1,9 @@
 import React, { Component } from 'react';
 import ObjectID from 'bson-objectid';
 import Square from './square';
+import { reflectBoardForDisplay } from '../utils/boardUtils';
 
 class Board extends Component {
-
-    reflectBoard = (board) => {
-
-        let fileIndex, rankIndex;
-        const newBoard = Array(8);
-        for (fileIndex = 0; fileIndex < 8; fileIndex++) {
-            newBoard[fileIndex] = Array(8);
-            for (rankIndex = 0; rankIndex < 8; rankIndex++) {
-                newBoard[fileIndex][rankIndex] = null;
-            }
-        }
-
-        for (fileIndex = 0; fileIndex < 8; fileIndex++) {
-            for (rankIndex = 0; rankIndex < 8; rankIndex++) {
-                newBoard[rankIndex][fileIndex] = board[fileIndex][rankIndex];
-            }
-        }
-
-        return newBoard;
-    }
 
     isValidMoveSquare(square) {
         const { validMoveSquares } = this.props;
@@ -46,7 +27,7 @@ class Board extends Component {
                 </div>
                 <div>
                     {
-                        this.reflectBoard(board).map(rank =>
+                        reflectBoardForDisplay(board).map(rank =>
                             <div key={counter++}>
                                 {rank.map((square) =>
                                     <Square

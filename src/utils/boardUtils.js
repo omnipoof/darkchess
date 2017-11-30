@@ -81,6 +81,25 @@ export const cloneBoard = (board) => {
   )));
 };
 
+export const reflectBoardForDisplay = (board) => {
+  let fileIndex, rankIndex;
+  const newBoard = Array(8);
+  for (fileIndex = 0; fileIndex < 8; fileIndex++) {
+      newBoard[fileIndex] = Array(8);
+      for (rankIndex = 0; rankIndex < 8; rankIndex++) {
+          newBoard[fileIndex][rankIndex] = null;
+      }
+  }
+
+  for (fileIndex = 0; fileIndex < 8; fileIndex++) {
+      for (rankIndex = 0; rankIndex < 8; rankIndex++) {
+          newBoard[rankIndex][fileIndex] = board[fileIndex][rankIndex];
+      }
+  }
+
+  return newBoard;
+}
+
 export const isPositionOnBoard = (position) => {
   const { fileIndex, rankIndex } = position;
   return fileIndex >= 0 && fileIndex < boardSize && rankIndex >= 0 && rankIndex < boardSize;
