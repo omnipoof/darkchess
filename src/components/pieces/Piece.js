@@ -32,8 +32,6 @@ class Piece {
       pieceType: this.type,
       fileIndex: destinationSquare.fileIndex,
       rankIndex: destinationSquare.rankIndex,
-      previousFileIndex: originSquare.fileIndex,
-      previousRankIndex: originSquare.rankIndex,
       capturedPiece,
       isCapture: capturedPiece,
     };

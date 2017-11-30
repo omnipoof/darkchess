@@ -92,7 +92,6 @@ export function writeAlgebraicNotation({
   originFileIndex,
   originRankIndex,
 }) {
-
   const playerPrefix = player === 'white' ? '' : '...';
   const file = String.fromCharCode('a'.charCodeAt(0) + fileIndex);
   const rank = 8 - rankIndex;
@@ -123,7 +122,7 @@ const isFileNotation = (character) => {
 
 const isRankNotation = (character) => {
   const value = parseInt(character, 10);
-  return Number.isInteger && value >= 1 && value <= 8;
+  return Number.isInteger(value) && value >= 1 && value <= 8;
 }
 
 const isCaptureNotation = (character) => {

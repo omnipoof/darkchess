@@ -118,7 +118,10 @@ export default class Pawn extends Piece {
       moveInfo.capturedPiece = board[destinationSquare.fileIndex][originSquare.rankIndex].piece;
       board[destinationSquare.fileIndex][originSquare.rankIndex].piece = null;
       moveInfo.board = board;
-      moveInfo.algebraicNotaiton = writeAlgebraicNotation(moveInfo)
+      moveInfo.algebraicNotaiton = writeAlgebraicNotation(moveInfo);
+    } else if (moveInfo.isCapture) {
+      moveInfo.originFileIndex = originSquare.fileIndex;
+      moveInfo.algebraicNotation = writeAlgebraicNotation(moveInfo);
     }
 
     this.state = {
