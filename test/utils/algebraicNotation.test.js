@@ -50,42 +50,16 @@ describe('Parsing Algebraic Notation', () => {
   });
 
   describe('Capture Notation', () => {
-    it('Test non-pawn piece \'x\' capture notation', () => {
+    it('Test non-pawn piece capture notation', () => {
       const parseResults = parseAlgebraicNotation('Bxe5');
       expect(parseResults.isCapture).toBeTruthy();
     });
 
-    it('Test non-pawn piece \':\' capture notation', () => {
-      const parseResults = parseAlgebraicNotation('B:e5');
-      expect(parseResults.isCapture).toBeTruthy();
-    });
-
-    it('Test non-pawn piece \':\' suffix capture notation', () => {
-      const parseResults = parseAlgebraicNotation('Be5:');
-      expect(parseResults.isCapture).toBeTruthy();
-    });
-
-    it('Test pawn piece \'x\' capture notation', () => {
+    it('Test pawn piece capture notation', () => {
       const parseResults = parseAlgebraicNotation('exd5');
       expect(parseResults.isCapture).toBeTruthy();
       expect(parseResults.file).toBe('d');
       expect(parseResults.rank).toBe(5);
-    });
-
-    it('Test pawn piece \':\' capture notation', () => {
-      const parseResults = parseAlgebraicNotation('e:d5');
-      expect(parseResults.isCapture).toBeTruthy();
-      expect(parseResults.file).toBe('d');
-      expect(parseResults.rank).toBe(5);
-      expect(parseResults.previousFileIndex).toBe(4);
-    });
-
-    it('Test pawn piece \':\' suffix capture notation', () => {
-      const parseResults = parseAlgebraicNotation('ed5:');
-      expect(parseResults.isCapture).toBeTruthy();
-      expect(parseResults.file).toBe('d');
-      expect(parseResults.rank).toBe(5);
-      expect(parseResults.previousFileIndex).toBe(4);
     });
 
     it('Test en passant capture notation', () => {
@@ -94,7 +68,7 @@ describe('Parsing Algebraic Notation', () => {
       expect(parseResults.isEnPassantCapture).toBeTruthy();
       expect(parseResults.file).toBe('d');
       expect(parseResults.rank).toBe(5);
-      expect(parseResults.previousFileIndex).toBe(4);
+      expect(parseResults.originFileIndex).toBe(4);
     });
 
     it('Test non-capture notation', () => {
@@ -115,6 +89,41 @@ describe('Parsing Algebraic Notation', () => {
           expect(parseResults.fileIndex).toBe(fileIndex);
           expect(parseResults.rankIndex).toBe(8 - rank);
         }
+      }
+    });
+  });
+
+  describe('Invalid Algebraic Notation', () => {
+    it('Test invalid character during file/rank/capture notation parsing', () => {
+      try {
+        const previousCharCode = String.fromCharCode('a'.charCodeAt(0) - 1);
+        const parseResults = parseAlgebraicNotation(`B${ previousCharCode }5`);
+      } catch (e) {
+        expect(e.startsWith('Invalid')).toBeTruthy();
+      }
+
+      try {
+        const parseResults = parseAlgebraicNotation('Bj5');
+      } catch (e) {
+        expect(e.startsWith('Invalid')).toBeTruthy();
+      }
+
+      try {
+        const parseResults = parseAlgebraicNotation('B 5');
+      } catch (e) {
+        expect(e.startsWith('Invalid')).toBeTruthy();
+      }
+
+      try {
+        const parseResults = parseAlgebraicNotation('Be0');
+      } catch (e) {
+        expect(e.startsWith('Invalid')).toBeTruthy();
+      }
+
+      try {
+        const parseResults = parseAlgebraicNotation('Be9');
+      } catch (e) {
+        expect(e.startsWith('Invalid')).toBeTruthy();
       }
     });
   });
@@ -140,6 +149,52 @@ describe('Writing Algebraic Notation', () => {
         rankIndex: 4,
       });
       expect(writeResults).toBe('...Be4');
+    });
+
+    it('Test disambiguous file notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        pieceType: 'bishop',
+        originFileIndex: 3,
+        fileIndex: 4,
+        rankIndex: 4,
+      });
+      expect(writeResults).toBe('Bde4');
+    });
+
+    it('Test disambiguous rank notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        pieceType: 'bishop',
+        originRankIndex: 3,
+        fileIndex: 4,
+        rankIndex: 4,
+      });
+      expect(writeResults).toBe('B5e4');
+    });
+
+    it('Test disambiguous file and rank notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        pieceType: 'bishop',
+        originFileIndex: 3,
+        originRankIndex: 3,
+        fileIndex: 4,
+        rankIndex: 4,
+      });
+      expect(writeResults).toBe('Bd5e4');
+    });
+
+    it('Test disambiguous file and rank notation with zero indices', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        pieceType: 'bishop',
+        originFileIndex: 0,
+        originRankIndex: 0,
+        fileIndex: 4,
+        rankIndex: 4,
+      });
+      expect(writeResults).toBe('Ba8e4');
     });
 
     it('Test capture notation', () => {
@@ -172,7 +227,7 @@ describe('Writing Algebraic Notation', () => {
         fileIndex: 4,
         rankIndex: 4,
         isCapture: true,
-        previousFileIndex: 3,
+        originFileIndex: 3,
       });
       expect(writeResults).toBe('dxe4');
     });
@@ -185,7 +240,7 @@ describe('Writing Algebraic Notation', () => {
         rankIndex: 4,
         isCapture: true,
         isEnPassantCapture: true,
-        previousFileIndex: 3,
+        originFileIndex: 3,
       });
       expect(writeResults).toBe('dxe4e.p.');
     });
@@ -222,5 +277,17 @@ describe('Parsing and Writing Algebraic Notation', () => {
 
   it('Test restoring pawn en passant capture notation', () => {
     expect(writeAlgebraicNotation(parseAlgebraicNotation('exd4e.p.'))).toBe('exd4e.p.');
+  });
+
+  it('Test restoring file disambiguation notation', () => {
+    expect(writeAlgebraicNotation(parseAlgebraicNotation('Bab5'))).toBe('Bab5');
+  });
+
+  it('Test restoring rank disambiguation notation', () => {
+    expect(writeAlgebraicNotation(parseAlgebraicNotation('B1b5'))).toBe('B1b5');
+  });
+
+  it('Test restoring file and rank disambiguation notation', () => {
+    expect(writeAlgebraicNotation(parseAlgebraicNotation('Ba1b5'))).toBe('Ba1b5');
   });
 });

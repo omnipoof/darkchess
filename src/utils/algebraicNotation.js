@@ -11,55 +11,62 @@ Object.keys(pieceLetterToTypeMap).forEach(key => pieceTypeToLetterMap[pieceLette
 
 export function parseAlgebraicNotation(algebraicNotation) {
 
-  let position = 0;
+  // String cursor position
+  let position = -1;
+
+  // Potential values obtained from the remaining characters
   let player = 'white';
-  if (algebraicNotation.startsWith('...')) {
+  let file, fileIndex;
+  let rank, rankIndex;
+  let originFile, originFileIndex;
+  let originRank, originRankIndex;
+  let isCapture = false;
+  let isEnPassantCapture = false;
+
+  algebraicNotation = algebraicNotation.split('...');
+  if (algebraicNotation.length === 2) {
     player = 'black';
-    position += 3;
+    algebraicNotation = algebraicNotation[1];
+  } else {
+    algebraicNotation = algebraicNotation[0];
   }
+
+  algebraicNotation = algebraicNotation.split('e.p.');
+  if (algebraicNotation.length === 2) {
+    isCapture = true;
+    isEnPassantCapture = true;
+  }
+  algebraicNotation = algebraicNotation[0];
 
   // Determine piece type
-  let pieceType = 'pawn';
-  let character = algebraicNotation.charAt(position);
+  let pieceType= 'pawn';
+  let character = algebraicNotation.charAt(0);
   if (Object.keys(pieceLetterToTypeMap).some( pieceLetter => pieceLetter === character )) {
     pieceType = pieceLetterToTypeMap[character];
-    position++;
+    algebraicNotation = algebraicNotation.substr(1);
   }
 
-  // Determine pawn origin file if capturing
-  let previousFileIndex = null;
-  if (pieceType === 'pawn' && (
-    isCaptureNotation(algebraicNotation, position + 1) ||
-      isNaN(algebraicNotation.charAt(position + 1))
-  )) {
-    const previousFile = algebraicNotation.charAt(position);
-    previousFileIndex = previousFile.charCodeAt(0) - 'a'.charCodeAt(0);
-    position++;
-  }
-
-  // Determine if capture occurring by non-pawn piece
-  let isCapture = isCaptureNotation(algebraicNotation, position);
-  if (isCapture) {
-    position++;
-  }
-
-  // Determine file
-  const file = algebraicNotation.charAt(position);
-  const fileIndex = file.charCodeAt(0) - 'a'.charCodeAt(0);
-  position++;
-
-  // Determine rank
-  const rank = parseInt(algebraicNotation.charAt(position), 10);
-  const rankIndex = 8 - rank;
-  position++;
-
-  // Determine if capture occuring
-  const captureSuffix = algebraicNotation.charAt(position);
-  if (captureSuffix === ':') {
-    isCapture = true;
-  }
-
-  const isEnPassantCapture = algebraicNotation.endsWith('e.p.');
+  algebraicNotation.split('').forEach((character) => {
+    if (isFileNotation(character)) {
+      if (file) {
+        originFile = file;
+        originFileIndex = fileIndex;
+      }
+      file = character;
+      fileIndex = getFileIndex(file);
+    } else if (isRankNotation(character)) {
+      if (rank) {
+        originRank = rank;
+        originRankIndex = rankIndex;
+      }
+      rank = parseRank(character);
+      rankIndex = getRankIndex(rank);
+    } else if (isCaptureNotation(character)) {
+      isCapture = true;
+    } else {
+      throw `Invalid Algebraic Notation: Expected file, rank, or capture notation; found '${ character }' instead`;
+    }
+  });
 
   return {
     player,
@@ -70,14 +77,38 @@ export function parseAlgebraicNotation(algebraicNotation) {
     fileIndex,
     rank,
     rankIndex,
-    previousFileIndex,
+    originFileIndex,
+    originRankIndex,
   };
 }
 
-const isCaptureNotation = (algebraicNotation, position) => {
-  const character = algebraicNotation.charAt(position);
-  return character === 'x' || character === ':';
+const isFileNotation = (character) => {
+  const charCode = character.charCodeAt(0);
+  const aCharCode = 'a'.charCodeAt(0);
+  const hCharCode = 'h'.charCodeAt(0);
+  return charCode >= aCharCode && charCode <= hCharCode;
+}
+
+const isRankNotation = (character) => {
+  const value = parseInt(character, 10);
+  return Number.isInteger && value >= 1 && value <= 8;
+}
+
+const isCaptureNotation = (character) => {
+  return character === 'x';
 };
+
+const parseRank = (character) => {
+  return parseInt(character, 10);
+}
+
+const getFileIndex = (file) => {
+  return file.charCodeAt(0) - 'a'.charCodeAt(0);
+}
+
+const getRankIndex = (rank) => {
+  return 8 - rank;
+}
 
 export function writeAlgebraicNotation({
   player,
@@ -86,7 +117,8 @@ export function writeAlgebraicNotation({
   isEnPassantCapture,
   fileIndex,
   rankIndex,
-  previousFileIndex,
+  originFileIndex,
+  originRankIndex,
 }) {
 
   const playerPrefix = player === 'white' ? '' : '...';
@@ -94,12 +126,18 @@ export function writeAlgebraicNotation({
   const rank = 8 - rankIndex;
   const captureNotation = isCapture ? 'x' : '';
 
+  // Disambiguate piece origin
+  const originFile = originFileIndex !== undefined ? String.fromCharCode('a'.charCodeAt(0) + originFileIndex) : '';
+  const originRank = originRankIndex !== undefined ? 8 - originRankIndex : '';
+
+  let algebraicNotation;
   if (pieceType === 'pawn') {
-    const previousFile = isCapture ? String.fromCharCode('a'.charCodeAt(0) + previousFileIndex) : '';
     const enPassantCaptureNotation = isEnPassantCapture ? 'e.p.' : '';
-    return `${ playerPrefix }${ previousFile }${ captureNotation }${ file }${ rank }${ enPassantCaptureNotation }`;
+    algebraicNotation = `${ playerPrefix }${ originFile }${ captureNotation }${ file }${ rank }${ enPassantCaptureNotation }`;
   } else {
     const pieceLetter = pieceTypeToLetterMap[pieceType];
-    return `${ playerPrefix }${ pieceLetter }${ captureNotation }${ file }${ rank }`;
+    algebraicNotation = `${ playerPrefix }${ pieceLetter }${ originFile }${ originRank }${ captureNotation }${ file }${ rank }`;
   }
+
+  return algebraicNotation;
 }
