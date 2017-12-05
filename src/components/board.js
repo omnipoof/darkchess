@@ -32,7 +32,6 @@ class Board extends Component {
                                 {rank.map((square) =>
                                     <Square
                                         key={counter++}
-                                        board={ board }
                                         square={ square }
                                         isSelected={ selectedSquare && square.fileIndex === selectedSquare.fileIndex && square.rankIndex === selectedSquare.rankIndex }
                                         isHighlighted={ this.isValidMoveSquare(square) }
