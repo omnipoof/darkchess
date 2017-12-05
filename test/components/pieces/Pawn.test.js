@@ -25,6 +25,7 @@ describe('Board > Piece > Pawn', () => {
       expect(board[0][3].piece).toBe(null);
       expect(moveInfo.isEnPassantCapture).toBeTruthy();
       expect(moveInfo.capturedPiece).toBe(capturedPawn);
+      expect(moveInfo.algebraicNotation).toBe('bxa6e.p.');
     });
 
     it('Test determining initial valid move scenarios', () => {

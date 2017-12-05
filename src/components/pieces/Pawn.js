@@ -115,10 +115,11 @@ export default class Pawn extends Piece {
     if (!moveInfo.isCapture && originSquare.fileIndex !== destinationSquare.fileIndex) {
       // An en passant capture occurred because the pawn moved diagonally but did not capture a piece normally
       moveInfo.isCapture = moveInfo.isEnPassantCapture = true;
+      moveInfo.originFileIndex = originSquare.fileIndex;
       moveInfo.capturedPiece = board[destinationSquare.fileIndex][originSquare.rankIndex].piece;
       board[destinationSquare.fileIndex][originSquare.rankIndex].piece = null;
       moveInfo.board = board;
-      moveInfo.algebraicNotaiton = writeAlgebraicNotation(moveInfo);
+      moveInfo.algebraicNotation = writeAlgebraicNotation(moveInfo);
     } else if (moveInfo.isCapture) {
       moveInfo.originFileIndex = originSquare.fileIndex;
       moveInfo.algebraicNotation = writeAlgebraicNotation(moveInfo);
