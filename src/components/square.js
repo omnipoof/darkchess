@@ -7,12 +7,13 @@ const getIcon = (piece) => {
 const Square = ({
   square,
   isSelected,
+  isChecked,
   isHighlighted,
   onSelectSquare,
 }) => {
   const piece = square.piece;
   const icon = piece ? getIcon(piece) : null;
-  const classNames = 'square' + (isSelected ? ' selected' : '') + (isHighlighted ? ' highlighted' : '');
+  const classNames = 'square' + (isSelected ? ' selected' : '') + (isHighlighted ? ' highlighted' : '') + (isChecked ? ' checked' : '');
   const file = String.fromCharCode('a'.charCodeAt(0) + square.fileIndex);
   const rank = 8 - square.rankIndex;
 

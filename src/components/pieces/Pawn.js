@@ -110,8 +110,8 @@ export default class Pawn extends Piece {
     return validMoves;
   }
 
-  move(board, originSquare, destinationSquare) {
-    const moveInfo = super.move(board, originSquare, destinationSquare);
+  move(board, originSquare, destinationSquare, history) {
+    const moveInfo = super.move(board, originSquare, destinationSquare, history);
     if (!moveInfo.isCapture && originSquare.fileIndex !== destinationSquare.fileIndex) {
       // An en passant capture occurred because the pawn moved diagonally but did not capture a piece normally
       moveInfo.isCapture = moveInfo.isEnPassantCapture = true;

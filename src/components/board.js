@@ -18,7 +18,7 @@ class Board extends Component {
     }
     
     render() {
-        const { board, selectedSquare, currentPlayer, onSelectSquare, history } = this.props;
+        const { board, selectedSquare, currentPlayer, isCheck, onSelectSquare, history } = this.props;
         let counter = 0;
         return (
             <div>
@@ -34,6 +34,7 @@ class Board extends Component {
                                         key={counter++}
                                         square={ square }
                                         isSelected={ selectedSquare && square.fileIndex === selectedSquare.fileIndex && square.rankIndex === selectedSquare.rankIndex }
+                                        isChecked={ isCheck && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
                                         isHighlighted={ this.isValidMoveSquare(square) }
                                         onSelectSquare={ () => onSelectSquare(board, selectedSquare, square) }
                                     />

@@ -16,8 +16,8 @@ const boardState = (state = {
   history: [],
 }, action) => {
 
-  const { board, selectedSquare, validMoveSquares, currentPlayer, history } = state;
-  const newState = { board: cloneBoard(board), selectedSquare, validMoveSquares, currentPlayer, history }
+  const { board, selectedSquare, validMoveSquares, currentPlayer, isCheck, history } = state;
+  const newState = { board: cloneBoard(board), selectedSquare, validMoveSquares, currentPlayer, isCheck, history }
   switch (action.type) {
     case INITIALIZE_BOARD:
       newState.board = createInitialBoard();
@@ -43,10 +43,12 @@ const boardState = (state = {
             newState.board,
             newState.board[selectedSquare.fileIndex][selectedSquare.rankIndex],
             newState.board[square.fileIndex][square.rankIndex],
+            newState.history,
           );
 
           newState.selectedSquare = null;
           newState.validMoveSquares = [];
+          newState.isCheck = moveInfo.isCheck;
           newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
           newState.history.push({
             move: moveInfo.algebraicNotation,

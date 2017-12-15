@@ -22,6 +22,13 @@ export function parseAlgebraicNotation(algebraicNotation) {
   let originRank, originRankIndex;
   let isCapture = false;
   let isEnPassantCapture = false;
+  let isCheck = false;
+
+  algebraicNotation = algebraicNotation.split('+');
+  if (algebraicNotation.length === 2) {
+    isCheck = true;
+  }
+  algebraicNotation = algebraicNotation[0];
 
   algebraicNotation = algebraicNotation.split('...');
   if (algebraicNotation.length === 2) {
@@ -73,6 +80,7 @@ export function parseAlgebraicNotation(algebraicNotation) {
     pieceType,
     isCapture,
     isEnPassantCapture,
+    isCheck,
     file,
     fileIndex,
     rank,
@@ -87,6 +95,7 @@ export function writeAlgebraicNotation({
   pieceType,
   isCapture,
   isEnPassantCapture,
+  isCheck,
   fileIndex,
   rankIndex,
   originFileIndex,
@@ -96,6 +105,7 @@ export function writeAlgebraicNotation({
   const file = String.fromCharCode('a'.charCodeAt(0) + fileIndex);
   const rank = 8 - rankIndex;
   const captureNotation = isCapture ? 'x' : '';
+  const checkNotation = isCheck ? '+' : '';
 
   // Disambiguate piece origin
   const originFile = originFileIndex !== undefined ? String.fromCharCode('a'.charCodeAt(0) + originFileIndex) : '';
@@ -104,10 +114,10 @@ export function writeAlgebraicNotation({
   let algebraicNotation;
   if (pieceType === 'pawn') {
     const enPassantCaptureNotation = isEnPassantCapture ? 'e.p.' : '';
-    algebraicNotation = `${ playerPrefix }${ originFile }${ captureNotation }${ file }${ rank }${ enPassantCaptureNotation }`;
+    algebraicNotation = `${ playerPrefix }${ originFile }${ captureNotation }${ file }${ rank }${ enPassantCaptureNotation }${ checkNotation }`;
   } else {
     const pieceLetter = pieceTypeToLetterMap[pieceType];
-    algebraicNotation = `${ playerPrefix }${ pieceLetter }${ originFile }${ originRank }${ captureNotation }${ file }${ rank }`;
+    algebraicNotation = `${ playerPrefix }${ pieceLetter }${ originFile }${ originRank }${ captureNotation }${ file }${ rank }${ checkNotation }`;
   }
 
   return algebraicNotation;

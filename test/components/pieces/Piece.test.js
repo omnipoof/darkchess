@@ -1,3 +1,6 @@
+import { createBoard } from '../../../src/utils/boardUtils';
+import { performMoves } from '../../../src/utils/testUtils';
+import { parseAlgebraicNotation } from '../../../src/utils/algebraicNotation';
 import Piece from '../../../src/components/pieces/Piece';
 import Queen from '../../../src/components/pieces/Queen';
 
@@ -33,5 +36,40 @@ describe('Board > Piece', () => {
       expect(e).toBeTruthy();
       expect(e.message).toBe('getValidMoves is an abstract method and must be implemented.');
     }
+  });
+
+  it('Test moving piece', () => {
+    const board = createBoard([
+      'Be4',
+    ]);
+    const moveResults = performMoves(board, [ 'e4f5' ]);
+    expect(moveResults.history[0].move).toBe('Bf5');
+  });
+
+  it('Test moving piece into check state', () => {
+    const board = createBoard([
+      'Be4',
+      '...Kc8',
+    ]);
+    const moveResults = performMoves(board, [ 'e4f5' ]);
+    const moveInfo = parseAlgebraicNotation(moveResults.history[0].move);
+    expect(moveInfo.isCheck).toBeTruthy();
+  });
+
+  it('Test moving piece exposing check state', () => {
+    const board = createBoard([
+      'Qb1',
+      'Rc3',
+      '...Kh8',
+    ]);
+    const moveResults = performMoves(board, [ 
+      'b1b2',
+      '...h8g7',
+      'c3c4',
+    ]);
+    let moveInfo = parseAlgebraicNotation(moveResults.history[0].move);
+    expect(moveInfo.isCheck).toBeFalsy();
+    moveInfo = parseAlgebraicNotation(moveResults.history[2].move);
+    expect(moveInfo.isCheck).toBeTruthy();
   });
 });

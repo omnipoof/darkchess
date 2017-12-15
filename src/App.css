@@ -25,3 +25,7 @@ div {
 .highlighted {
   background-color: yellow;
 }
+
+.checked {
+  background-color: red;
+}

@@ -25,7 +25,7 @@ export const performMoves = (initialBoard, moves) => {
 
     const originSquare = board[originFileIndex][originRankIndex];
     const destinationSquare = board[fileIndex][rankIndex];
-    const moveInfo = originSquare.piece.move(board, originSquare, destinationSquare);
+    const moveInfo = originSquare.piece.move(board, originSquare, destinationSquare, history);
     history.push({ move: moveInfo.algebraicNotation, board: cloneBoard(board) });
   });
 
