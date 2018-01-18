@@ -9,7 +9,7 @@ export default class Knight extends Piece {
     super('knight', player);
   }
 
-  getValidMoves(board, position) {
+  getOptimisticValidMoves(board, position) {
 
     const { fileIndex, rankIndex } = position;
     const newPositions = [

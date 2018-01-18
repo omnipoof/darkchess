@@ -13,7 +13,7 @@ export default class Rook extends Piece {
     super('rook', player);
   }
 
-  getValidMoves(board, position) {
+  getOptimisticValidMoves(board, position) {
 
     const directions = [
       UP,

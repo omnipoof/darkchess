@@ -20,7 +20,7 @@ export default class Pawn extends Piece {
     };
   }
 
-  getValidMoves(board, position, history) {
+  getOptimisticValidMoves(board, position, history) {
 
     const getPiece = (position) => {
       const { fileIndex, rankIndex } = position;

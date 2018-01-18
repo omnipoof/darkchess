@@ -4,24 +4,32 @@ import Knight from '../components/pieces/Knight';
 import Bishop from '../components/pieces/Bishop';
 import Queen from '../components/pieces/Queen';
 import King from '../components/pieces/King';
-import { createInitialBoard, cloneBoard } from '../utils/boardUtils';
+import { createInitialBoard } from '../utils/boardCreationUtils';
+import { cloneBoard } from '../utils/boardUtils';
 
 import { INITIALIZE_BOARD, SELECT_SQUARE } from '../actions';
 
-const boardState = (state = {
-  board: createInitialBoard(),
-  selectedSquare: null,
-  validMoveSquares: [],
-  currentPlayer: 'white',
-  history: [],
-}, action) => {
+const createInitialState = () => {
+  const board = createInitialBoard();
+  return {
+    board,
+    selectedSquare: null,
+    validMoveSquares: [],
+    currentPlayer: 'white',
+    history: [{
+      move: 'Start',
+      board,
+    }],
+  }
+};
+
+const boardState = (state = createInitialState(), action) => {
 
   const { board, selectedSquare, validMoveSquares, currentPlayer, isCheck, history } = state;
   const newState = { board: cloneBoard(board), selectedSquare, validMoveSquares, currentPlayer, isCheck, history }
   switch (action.type) {
     case INITIALIZE_BOARD:
-      newState.board = createInitialBoard();
-      break;
+      return createInitialState();
     case SELECT_SQUARE:
       const { square } = action;
 
@@ -90,7 +98,7 @@ const toggleSquareSelection = (selectedSquare, square) => {
 
 const getValidMovesFromSquare = (board, square, history) => {
   const piece = square.piece;
-  return piece ? piece.getValidMoves(board, square, history) : [];
+  return piece ? piece.getValidMoves(board, square, history, true) : [];
 };
 
 export default boardState;

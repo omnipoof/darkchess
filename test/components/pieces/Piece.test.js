@@ -1,4 +1,4 @@
-import { createBoard } from '../../../src/utils/boardUtils';
+import { createBoard } from '../../../src/utils/boardCreationUtils';
 import { performMoves } from '../../../src/utils/testUtils';
 import { parseAlgebraicNotation } from '../../../src/utils/algebraicNotation';
 import Piece from '../../../src/components/pieces/Piece';
@@ -34,8 +34,21 @@ describe('Board > Piece', () => {
       const piece = new TestPiece('white');
     } catch (e) {
       expect(e).toBeTruthy();
-      expect(e.message).toBe('getValidMoves is an abstract method and must be implemented.');
+      expect(e.message).toBe('getOptimisticValidMoves is an abstract method and must be implemented.');
     }
+  });
+
+  it('Test filtering valid moves if they will create a check state', () => {
+    const board = createBoard([
+      '...Ba1',
+      'Kh8',
+      'f6',
+    ]);
+    const originSquare = board[5][2];
+    let validMoves = originSquare.piece.getValidMoves(board, originSquare, [], false);
+    expect(validMoves.length).toBe(2);
+    validMoves = originSquare.piece.getValidMoves(board, originSquare, [], true);
+    expect(validMoves.length).toBe(0);
   });
 
   it('Test moving piece', () => {

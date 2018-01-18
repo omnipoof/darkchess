@@ -1,4 +1,4 @@
-import { createBoard } from '../../../src/utils/boardUtils';
+import { createBoard } from '../../../src/utils/boardCreationUtils';
 import Rook from '../../../src/components/pieces/Rook';
 
 describe('Board > Piece > Rook', () => {

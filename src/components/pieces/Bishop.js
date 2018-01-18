@@ -13,7 +13,7 @@ export default class Bishop extends Piece {
     super('bishop', player);
   }
 
-  getValidMoves(board, position) {
+  getOptimisticValidMoves(board, position) {
 
     const directions = [
       UP | LEFT,

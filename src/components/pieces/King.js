@@ -13,7 +13,7 @@ export default class King extends Piece {
     super('king', player);
   }
 
-  getValidMoves(board, position) {
+  getOptimisticValidMoves(board, position) {
 
     const directions = [
       UP | LEFT,

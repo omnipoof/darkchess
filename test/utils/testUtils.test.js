@@ -1,4 +1,4 @@
-import { createInitialBoard } from '../../src/utils/boardUtils';
+import { createInitialBoard } from '../../src/utils/boardCreationUtils';
 import { performMoves, getBoardAsString } from '../../src/utils/testUtils';
 
 describe('Test Utils', () => {

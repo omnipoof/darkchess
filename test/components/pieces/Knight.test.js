@@ -1,4 +1,4 @@
-import { createEmptyBoard, createBoard } from '../../../src/utils/boardUtils';
+import { createEmptyBoard, createBoard } from '../../../src/utils/boardCreationUtils';
 import Knight from '../../../src/components/pieces/Knight';
 
 describe('Board > Piece > Knight', () => {

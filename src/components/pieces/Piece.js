@@ -1,5 +1,11 @@
 import ObjectID from 'bson-objectid';
 import { writeAlgebraicNotation } from '../../utils/algebraicNotation';
+import {
+  cloneBoard,
+  getPlayersKingSquare,
+  getValidMovesForAllPlayersPieces,
+  isPlayersKingInCheck,
+} from '../../utils/boardUtils';
 
 class Piece {
 
@@ -8,7 +14,7 @@ class Piece {
     if (new.target === Piece) {
       throw new TypeError('Piece is an abstract class and cannot be instantiated.');
     }
-    this.enforceMethodAbstraction('getValidMoves');
+    this.enforceMethodAbstraction('getOptimisticValidMoves');
 
     this.id = ObjectID();
     this.type = type;
@@ -19,6 +25,22 @@ class Piece {
     if (this[methodName] === undefined) {
       throw new TypeError(`${ methodName } is an abstract method and must be implemented.`);
     }
+  }
+
+  getValidMoves(board, originSquare, history, filterCheckMoves) {
+    let validMoves = this.getOptimisticValidMoves(board, originSquare, history);
+    if (filterCheckMoves) {
+      validMoves = validMoves.filter((validMove) => {
+        const clonedBoard = cloneBoard(board);
+        const clonedOriginSquare = clonedBoard[originSquare.fileIndex][originSquare.rankIndex];
+        const clonedValidMove = clonedBoard[validMove.fileIndex][validMove.rankIndex];
+        const clonedHistory = history.slice();
+        const moveInfo = this.move(clonedBoard, clonedOriginSquare, clonedValidMove, clonedHistory);
+        const isCheck = isPlayersKingInCheck(moveInfo.board, history, this.player);
+        return !isCheck;
+      });
+    }
+    return validMoves;
   }
 
   move(board, originSquare, destinationSquare, history) {
@@ -34,40 +56,8 @@ class Piece {
       rankIndex: destinationSquare.rankIndex,
       capturedPiece,
       isCapture: capturedPiece,
+      isCheck: isPlayersKingInCheck(board, history, this.player === 'white' ? 'black' : 'white'),
     };
-
-    // Find opponent's king
-    let opponentsKingSquare = null;
-    const playerPieceSquares = [];
-    let fileIndex, rankIndex;
-    for (fileIndex = 0; fileIndex < 8; fileIndex++) {
-      for (rankIndex = 0; rankIndex < 8; rankIndex++) {
-        const square = board[fileIndex][rankIndex];
-        const piece = square.piece;
-        if (piece) {
-          if (piece.type === 'king' && piece.player !== this.player) {
-            opponentsKingSquare = square;
-          } else if (piece.player === this.player) {
-            playerPieceSquares.push(square);
-          }
-        }
-      }
-    }
-
-    // Find if opponent's king's square is a valid move for any of the current player's pieces
-    if (opponentsKingSquare) { // King may not be present during testing
-      const isCheck = playerPieceSquares.some((square) => {
-        const piece = square.piece;
-        const validMoves = piece.getValidMoves(board, square, history);
-        return validMoves.some((validMove) => {
-          const x = validMove.fileIndex === opponentsKingSquare.fileIndex &&
-          validMove.rankIndex === opponentsKingSquare.rankIndex
-          return x;
-        });
-      });
-  
-      moveInfo.isCheck = isCheck;
-    }
     
     moveInfo.algebraicNotation = writeAlgebraicNotation(moveInfo);
     return moveInfo;

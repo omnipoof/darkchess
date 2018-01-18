@@ -1,4 +1,4 @@
-import { createBoard } from '../../../src/utils/boardUtils';
+import { createBoard } from '../../../src/utils/boardCreationUtils';
 import Queen from '../../../src/components/pieces/Queen';
 
 describe('Board > Piece > Queen', () => {
