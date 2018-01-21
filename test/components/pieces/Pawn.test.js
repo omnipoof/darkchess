@@ -20,13 +20,15 @@ describe('Board > Piece > Pawn', () => {
       const capturedPawn = new Pawn('black');
       board[0][1].piece = capturedPawn;
       board[1][3].piece = pawn;
-      capturedPawn.move(board, board[0][1], board[0][3]);
-      const moveInfo = pawn.move(board, board[1][3], board[0][2]);
-      expect(board[0][2].piece).toBe(pawn);
-      expect(board[0][3].piece).toBe(null);
-      expect(moveInfo.isEnPassantCapture).toBeTruthy();
-      expect(moveInfo.capturedPiece).toBe(capturedPawn);
-      expect(moveInfo.algebraicNotation).toBe('bxa6e.p.');
+      const moveResults = performMoves(board, [
+        '...a7a5',
+        'b5a6',
+      ]);
+      const lastMove = moveResults.history[2];
+      expect(lastMove.board[0][2].piece.type).toBe('pawn');
+      expect(lastMove.board[0][2].piece.player).toBe('white');
+      expect(lastMove.board[0][3].piece).toBe(null);
+      expect(lastMove.move).toBe('bxa6e.p.');
     });
 
     it('Test determining initial valid move scenarios', () => {

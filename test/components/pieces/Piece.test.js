@@ -54,9 +54,10 @@ describe('Board > Piece', () => {
   it('Test moving piece', () => {
     const board = createBoard([
       'Be4',
+      '...Kc7',
     ]);
     const moveResults = performMoves(board, [ 'e4f5' ]);
-    expect(moveResults.history[0].move).toBe('Bf5');
+    expect(moveResults.history[1].move).toBe('Bf5');
   });
 
   it('Test moving piece into check state', () => {
@@ -65,7 +66,7 @@ describe('Board > Piece', () => {
       '...Kc8',
     ]);
     const moveResults = performMoves(board, [ 'e4f5' ]);
-    const moveInfo = parseAlgebraicNotation(moveResults.history[0].move);
+    const moveInfo = parseAlgebraicNotation(moveResults.history[1].move);
     expect(moveInfo.isCheck).toBeTruthy();
   });
 
@@ -80,9 +81,54 @@ describe('Board > Piece', () => {
       '...h8g7',
       'c3c4',
     ]);
-    let moveInfo = parseAlgebraicNotation(moveResults.history[0].move);
+    let moveInfo = parseAlgebraicNotation(moveResults.history[1].move);
     expect(moveInfo.isCheck).toBeFalsy();
-    moveInfo = parseAlgebraicNotation(moveResults.history[2].move);
+    moveInfo = parseAlgebraicNotation(moveResults.history[3].move);
     expect(moveInfo.isCheck).toBeTruthy();
+  });
+
+  it('Test moving piece into checkmate state', () => {
+    const board = createBoard([
+      'Be4',
+      '...b8',
+      '...b7',
+      '...c7',
+      '...Bd8',
+      '...Kc8',
+    ]);
+    const moveResults = performMoves(board, [ 'e4f5' ]);
+    const moveInfo = parseAlgebraicNotation(moveResults.history[1].move);
+    expect(moveInfo.isCheck).toBeTruthy();
+    expect(moveInfo.isCheckmate).toBeTruthy();
+  });
+
+  it('Test moving piece into check state but another piece can intercept', () => {
+    const board = createBoard([
+      'Be4',
+      '...b8',
+      '...b7',
+      '...c7',
+      '...Rd8',
+      '...Kc8',
+    ]);
+    const moveResults = performMoves(board, [ 'e4f5' ]);
+    const moveInfo = parseAlgebraicNotation(moveResults.history[1].move);
+    expect(moveInfo.isCheck).toBeTruthy();
+    expect(moveInfo.isCheckmate).toBeFalsy();
+  });
+
+  it('Test moving piece into check state but another piece can capture checker', () => {
+    const board = createBoard([
+      'Bd5',
+      '...b8',
+      '...b7',
+      '...c7',
+      '...Nd8',
+      '...Kc8',
+    ]);
+    const moveResults = performMoves(board, [ 'd5e6' ]);
+    const moveInfo = parseAlgebraicNotation(moveResults.history[1].move);
+    expect(moveInfo.isCheck).toBeTruthy();
+    expect(moveInfo.isCheckmate).toBeFalsy();
   });
 });

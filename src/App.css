@@ -29,3 +29,7 @@ div {
 .checked {
   background-color: red;
 }
+
+.checkmated {
+  background-color: purple;
+}

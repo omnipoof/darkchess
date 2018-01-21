@@ -94,7 +94,12 @@ export const getValidMovesForAllPlayersPieces = (board, history, player) => {
       const square = board[fileIndex][rankIndex];
       const piece = square.piece;
       if (piece && piece.player === player) {
-        allValidMoves = allValidMoves.concat(piece.getValidMoves(board, square, history));
+        allValidMoves = allValidMoves.concat(piece.getValidMoves(board, square, history).map((validMove) => (
+          {
+            originSquare: square,
+            destinationSquare: validMove,
+          }
+        )));
       }
     }
   }
@@ -123,10 +128,26 @@ export const isPlayersKingInCheck = (board, history, player) => {
     const opponent = player === 'white' ? 'black' : 'white';
     const allValidMoves = getValidMovesForAllPlayersPieces(board, history, opponent);
     return allValidMoves.some((validMove) => (
-      validMove.fileIndex === kingSquare.fileIndex &&
-      validMove.rankIndex === kingSquare.rankIndex
+      validMove.destinationSquare.fileIndex === kingSquare.fileIndex &&
+      validMove.destinationSquare.rankIndex === kingSquare.rankIndex
     ));
   }
 
   return false;
 };
+
+export const isPlayersKingInCheckAfterMove = (originSquare, destinationSquare, board, history, player) => {
+  const clonedBoard = cloneBoard(board);
+  const clonedOriginSquare = clonedBoard[originSquare.fileIndex][originSquare.rankIndex];
+  const clonedDestinationSquare = clonedBoard[destinationSquare.fileIndex][destinationSquare.rankIndex];
+  const clonedHistory = history.slice();
+  const moveInfo = originSquare.piece.move(clonedBoard, clonedOriginSquare, clonedDestinationSquare, clonedHistory);
+  return isPlayersKingInCheck(moveInfo.board, history, player);
+};
+
+export const isPlayersKingCheckmated = (board, history, player) => {
+  const allValidMoves = getValidMovesForAllPlayersPieces(board, history, player);
+  return allValidMoves.length === 0 || allValidMoves.every(({ originSquare, destinationSquare }) => {
+    return isPlayersKingInCheckAfterMove(originSquare, destinationSquare, board, history, player);
+  });
+}

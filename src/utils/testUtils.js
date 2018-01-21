@@ -12,7 +12,10 @@ const pieceTypeToLetterMap = {
 
 export const performMoves = (initialBoard, moves) => {
   const board = cloneBoard(initialBoard);
-  const history = [];
+  const history = [{
+    move: 'Start',
+    board,
+  }];
   moves.forEach((move) => {
     const {
       currentPlayer,
@@ -25,7 +28,7 @@ export const performMoves = (initialBoard, moves) => {
 
     const originSquare = board[originFileIndex][originRankIndex];
     const destinationSquare = board[fileIndex][rankIndex];
-    const moveInfo = originSquare.piece.move(board, originSquare, destinationSquare, history);
+    const moveInfo = originSquare.piece.move(board, originSquare, destinationSquare, history, true);
     history.push({ move: moveInfo.algebraicNotation, board: cloneBoard(board) });
   });
 

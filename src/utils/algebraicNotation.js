@@ -23,10 +23,14 @@ export function parseAlgebraicNotation(algebraicNotation) {
   let isCapture = false;
   let isEnPassantCapture = false;
   let isCheck = false;
+  let isCheckmate = false;
 
   algebraicNotation = algebraicNotation.split('+');
-  if (algebraicNotation.length === 2) {
+  if (algebraicNotation.length >= 2) {
     isCheck = true;
+    if (algebraicNotation.length === 3) {
+      isCheckmate = true;
+    }
   }
   algebraicNotation = algebraicNotation[0];
 
@@ -81,6 +85,7 @@ export function parseAlgebraicNotation(algebraicNotation) {
     isCapture,
     isEnPassantCapture,
     isCheck,
+    isCheckmate,
     file,
     fileIndex,
     rank,
@@ -96,6 +101,7 @@ export function writeAlgebraicNotation({
   isCapture,
   isEnPassantCapture,
   isCheck,
+  isCheckmate,
   fileIndex,
   rankIndex,
   originFileIndex,
@@ -106,6 +112,7 @@ export function writeAlgebraicNotation({
   const rank = 8 - rankIndex;
   const captureNotation = isCapture ? 'x' : '';
   const checkNotation = isCheck ? '+' : '';
+  const checkmateNotation = isCheckmate ? '+' : '';
 
   // Disambiguate piece origin
   const originFile = originFileIndex !== undefined ? String.fromCharCode('a'.charCodeAt(0) + originFileIndex) : '';
@@ -114,10 +121,10 @@ export function writeAlgebraicNotation({
   let algebraicNotation;
   if (pieceType === 'pawn') {
     const enPassantCaptureNotation = isEnPassantCapture ? 'e.p.' : '';
-    algebraicNotation = `${ playerPrefix }${ originFile }${ captureNotation }${ file }${ rank }${ enPassantCaptureNotation }${ checkNotation }`;
+    algebraicNotation = `${ playerPrefix }${ originFile }${ captureNotation }${ file }${ rank }${ enPassantCaptureNotation }${ checkNotation }${ checkmateNotation }`;
   } else {
     const pieceLetter = pieceTypeToLetterMap[pieceType];
-    algebraicNotation = `${ playerPrefix }${ pieceLetter }${ originFile }${ originRank }${ captureNotation }${ file }${ rank }${ checkNotation }`;
+    algebraicNotation = `${ playerPrefix }${ pieceLetter }${ originFile }${ originRank }${ captureNotation }${ file }${ rank }${ checkNotation }${ checkmateNotation }`;
   }
 
   return algebraicNotation;

@@ -88,6 +88,17 @@ describe('Parsing Algebraic Notation', () => {
     });
   });
 
+  describe('Checkmate Notation', () => {
+    it('Test checkmate notation', () => {
+      let parseResults = parseAlgebraicNotation('Bxe5++');
+      expect(parseResults.isCheckmate).toBeTruthy();
+      parseResults = parseAlgebraicNotation('exd5e.p.++');
+      expect(parseResults.isCheck).toBeTruthy();
+      parseResults = parseAlgebraicNotation('Be5');
+      expect(parseResults.isCheck).toBeFalsy();
+    });
+  });
+
   describe('File and Rank Notation', () => {
     it('Test each board position\'s notation', () => {
       for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
@@ -229,7 +240,20 @@ describe('Writing Algebraic Notation', () => {
         isCheck: true,
       });
       expect(writeResults).toBe('Bxe4+');
-    })
+    });
+
+    it('Test checkmate notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        pieceType: 'bishop',
+        fileIndex: 4,
+        rankIndex: 4,
+        isCapture: true,
+        isCheck: true,
+        isCheckmate: true,
+      });
+      expect(writeResults).toBe('Bxe4++');
+    });
   });
 
   describe('Writing Pawn Algebraic Notation', () => {
@@ -304,6 +328,10 @@ describe('Parsing and Writing Algebraic Notation', () => {
 
   it('Test restoring check notation', () => {
     expect(writeAlgebraicNotation(parseAlgebraicNotation('Be5+'))).toBe('Be5+');
+  });
+
+  it('Test restoring checkmate notation', () => {
+    expect(writeAlgebraicNotation(parseAlgebraicNotation('Be5++'))).toBe('Be5++');
   });
 
   it('Test restoring file disambiguation notation', () => {

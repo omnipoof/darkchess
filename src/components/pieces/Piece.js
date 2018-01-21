@@ -3,8 +3,9 @@ import { writeAlgebraicNotation } from '../../utils/algebraicNotation';
 import {
   cloneBoard,
   getPlayersKingSquare,
-  getValidMovesForAllPlayersPieces,
   isPlayersKingInCheck,
+  isPlayersKingInCheckAfterMove,
+  isPlayersKingCheckmated,
 } from '../../utils/boardUtils';
 
 class Piece {
@@ -30,20 +31,14 @@ class Piece {
   getValidMoves(board, originSquare, history, filterCheckMoves) {
     let validMoves = this.getOptimisticValidMoves(board, originSquare, history);
     if (filterCheckMoves) {
-      validMoves = validMoves.filter((validMove) => {
-        const clonedBoard = cloneBoard(board);
-        const clonedOriginSquare = clonedBoard[originSquare.fileIndex][originSquare.rankIndex];
-        const clonedValidMove = clonedBoard[validMove.fileIndex][validMove.rankIndex];
-        const clonedHistory = history.slice();
-        const moveInfo = this.move(clonedBoard, clonedOriginSquare, clonedValidMove, clonedHistory);
-        const isCheck = isPlayersKingInCheck(moveInfo.board, history, this.player);
-        return !isCheck;
-      });
+      validMoves = validMoves.filter((validMove) => (
+        !isPlayersKingInCheckAfterMove(originSquare, validMove, board, history, this.player)
+      ));
     }
     return validMoves;
   }
 
-  move(board, originSquare, destinationSquare, history) {
+  move(board, originSquare, destinationSquare, history, determineCheckmateState) {
     const capturedPiece = destinationSquare.piece;
     destinationSquare.piece = originSquare.piece;
     originSquare.piece = null;
@@ -59,6 +54,10 @@ class Piece {
       isCheck: isPlayersKingInCheck(board, history, this.player === 'white' ? 'black' : 'white'),
     };
     
+    if (determineCheckmateState) {
+      moveInfo.isCheckmate = isPlayersKingCheckmated(board, history, this.player === 'white' ? 'black' : 'white');
+    }
+
     moveInfo.algebraicNotation = writeAlgebraicNotation(moveInfo);
     return moveInfo;
   }

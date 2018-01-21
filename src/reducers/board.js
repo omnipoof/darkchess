@@ -25,12 +25,16 @@ const createInitialState = () => {
 
 const boardState = (state = createInitialState(), action) => {
 
-  const { board, selectedSquare, validMoveSquares, currentPlayer, isCheck, history } = state;
-  const newState = { board: cloneBoard(board), selectedSquare, validMoveSquares, currentPlayer, isCheck, history }
+  const { board, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history } = state;
+  const newState = { board: cloneBoard(board), selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history }
   switch (action.type) {
     case INITIALIZE_BOARD:
       return createInitialState();
     case SELECT_SQUARE:
+      if (isCheckmate) {
+        break;
+      }
+
       const { square } = action;
 
       if (selectedSquare) {
@@ -52,11 +56,13 @@ const boardState = (state = createInitialState(), action) => {
             newState.board[selectedSquare.fileIndex][selectedSquare.rankIndex],
             newState.board[square.fileIndex][square.rankIndex],
             newState.history,
+            true // Determine the checkmate state
           );
 
           newState.selectedSquare = null;
           newState.validMoveSquares = [];
           newState.isCheck = moveInfo.isCheck;
+          newState.isCheckmate = moveInfo.isCheckmate;
           newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
           newState.history.push({
             move: moveInfo.algebraicNotation,
