@@ -15,9 +15,6 @@ export default class Pawn extends Piece {
 
   constructor(player) {
     super('pawn', player);
-    this.state = {
-      hasMoved: false,
-    };
   }
 
   getOptimisticValidMoves(board, position, history) {
@@ -60,7 +57,6 @@ export default class Pawn extends Piece {
       }
     }
         
-    const { hasMoved } = this.state;
     const verticalDirection = this.player === 'black' ? DOWN : UP;
     const validMoves = [];
 
@@ -70,7 +66,7 @@ export default class Pawn extends Piece {
       validMoves.push(nextPosition);
       // Check if a two square initial move is possible
       nextPosition = getAdjacentPosition(nextPosition, verticalDirection);
-      if (!hasMoved && !isPositionOccupied(nextPosition)) {
+      if (!this.hasMoved && !isPositionOccupied(nextPosition)) {
         validMoves.push(nextPosition);
       }
     }
@@ -110,8 +106,8 @@ export default class Pawn extends Piece {
     return validMoves;
   }
 
-  move(board, originSquare, destinationSquare, history) {
-    const moveInfo = super.move(board, originSquare, destinationSquare, history);
+  move(board, originSquare, destinationSquare, history, isOfficialMove) {
+    const moveInfo = super.move(board, originSquare, destinationSquare, history, isOfficialMove);
     if (!moveInfo.isCapture && originSquare.fileIndex !== destinationSquare.fileIndex) {
       // An en passant capture occurred because the pawn moved diagonally but did not capture a piece normally
       moveInfo.isCapture = moveInfo.isEnPassantCapture = true;
@@ -123,10 +119,6 @@ export default class Pawn extends Piece {
     } else if (moveInfo.isCapture) {
       moveInfo.originFileIndex = originSquare.fileIndex;
       moveInfo.algebraicNotation = writeAlgebraicNotation(moveInfo);
-    }
-
-    this.state = {
-      hasMoved: true,
     }
 
     return moveInfo;

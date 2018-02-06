@@ -15,16 +15,15 @@ describe('Board > Piece > Pawn', () => {
     });
 
     it('Test en passant capture', () => {
-      const board = createEmptyBoard();
-      const pawn = new Pawn('white');
-      const capturedPawn = new Pawn('black');
-      board[0][1].piece = capturedPawn;
-      board[1][3].piece = pawn;
+      const board = createInitialBoard();
       const moveResults = performMoves(board, [
+        'b2b4',
+        '...b7b6',
+        'b4b5',
         '...a7a5',
         'b5a6',
       ]);
-      const lastMove = moveResults.history[2];
+      const lastMove = moveResults.history[5];
       expect(lastMove.board[0][2].piece.type).toBe('pawn');
       expect(lastMove.board[0][2].piece.player).toBe('white');
       expect(lastMove.board[0][3].piece).toBe(null);
@@ -42,11 +41,15 @@ describe('Board > Piece > Pawn', () => {
     });
   
     it('Test determining non-initial valid move scenarios', () => {
-      const board = createEmptyBoard();
-      const pawn = new Pawn('white');
-      board[2][4].piece = pawn;
-      pawn.move(board, board[2][4], board[2][5]);
-      const validMoves = pawn.getValidMoves(board, board[2][5]);
+      const board = createInitialBoard();
+      const moveResults = performMoves(board, [
+        'a2a4',
+        '...h7h5',
+      ]);
+      const updatedBoard = moveResults.board;
+      const originSquare = updatedBoard[0][4];
+      const pawn = originSquare.piece;
+      let validMoves = pawn.getValidMoves(updatedBoard, originSquare, moveResults.history, true);
       expect(validMoves.length).toBe(1);
     });
   
@@ -226,11 +229,12 @@ describe('Board > Piece > Pawn', () => {
 
   describe('Capturing', () => {
     it('Test determining capture valid move scenarios', () => {
-      const board = createBoard(['...a8', '...c8']);
-      const pawn = new Pawn('white');
-      board[1][2].piece = pawn;
-      pawn.move(board, board[1][2], board[1][1]);
-      const validMoves = pawn.getValidMoves(board, board[1][1]);
+      const board = createBoard(['...a8', '...c8', 'b6']);
+      const moveResults = performMoves(board, [ 'b6b7' ]);
+      const updatedBoard = moveResults.board;
+      const originSquare = updatedBoard[1][1];
+      const pawn = originSquare.piece;
+      const validMoves = pawn.getValidMoves(updatedBoard, originSquare, moveResults.history, true);
       expect(validMoves.length).toBe(3);
     });
   });

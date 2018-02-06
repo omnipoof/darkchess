@@ -20,6 +20,7 @@ class Piece {
     this.id = ObjectID();
     this.type = type;
     this.player = player;
+    this.hasMoved = false;
   }
 
   enforceMethodAbstraction(methodName) {
@@ -38,10 +39,11 @@ class Piece {
     return validMoves;
   }
 
-  move(board, originSquare, destinationSquare, history, determineCheckmateState) {
+  move(board, originSquare, destinationSquare, history, isOfficialMove) {
     const capturedPiece = destinationSquare.piece;
     destinationSquare.piece = originSquare.piece;
     originSquare.piece = null;
+
     const moveInfo = {
       board,
       player: this.player,
@@ -53,12 +55,12 @@ class Piece {
       isCapture: capturedPiece,
       isCheck: isPlayersKingInCheck(board, history, this.player === 'white' ? 'black' : 'white'),
     };
-    
-    if (determineCheckmateState) {
+    if (isOfficialMove) {
       moveInfo.isCheckmate = isPlayersKingCheckmated(board, history, this.player === 'white' ? 'black' : 'white');
+      this.hasMoved = true;
     }
-
     moveInfo.algebraicNotation = writeAlgebraicNotation(moveInfo);
+
     return moveInfo;
   }
 }
