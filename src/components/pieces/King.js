@@ -7,7 +7,7 @@ import {
   getValidMovesInDirections,
   getValidMovesForAllPlayersPieces,
 } from '../../utils/boardUtils';
-import { parseAlgebraicNotation } from '../../utils/algebraicNotation';
+import { parseAlgebraicNotation, writeAlgebraicNotation } from '../../utils/algebraicNotation';
 
 export default class King extends Piece {
   constructor(player) {
@@ -85,5 +85,30 @@ export default class King extends Piece {
     }
 
     return validMoves;
+  }
+
+  move(board, originSquare, destinationSquare, history, isOfficialMove) {
+    const moveInfo = super.move(board, originSquare, destinationSquare, history, isOfficialMove);
+    const { fileIndex: originFileIndex } = originSquare;
+    const { fileIndex: destinationFileIndex, rankIndex: destinationRankIndex } = destinationSquare;
+    if (Math.abs(originFileIndex - destinationFileIndex) === 2) {
+      // A castling move occurred because the king moved two spaces
+      const rookOriginFileIndex = originFileIndex < destinationFileIndex ? 7 : 0;
+      const rookDestinationFileIndex = destinationFileIndex + (originFileIndex < destinationFileIndex ? -1 : 1);
+      const rookOriginRankIndex = destinationRankIndex;
+      const rookDestinationRankIndex = destinationRankIndex;
+
+      // Move the rook
+      const rook = board[rookOriginFileIndex][rookOriginRankIndex].piece;
+      board[rookDestinationFileIndex][rookDestinationRankIndex].piece = rook;
+      board[rookOriginFileIndex][rookOriginRankIndex].piece = null;
+
+      // Update the move information
+      moveInfo.board = board;
+      moveInfo.hasCastled = true;
+      moveInfo.algebraicNotation = writeAlgebraicNotation(moveInfo);
+    }
+
+    return moveInfo;
   }
 }

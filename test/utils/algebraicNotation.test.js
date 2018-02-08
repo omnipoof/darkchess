@@ -99,6 +99,42 @@ describe('Parsing Algebraic Notation', () => {
     });
   });
 
+  describe('Castling Notation', () => {
+    it('Test castling notation', () => {
+      let parseResults = parseAlgebraicNotation('0-0');
+      expect(parseResults.player).toBe('white');
+      expect(parseResults.pieceType).toBe('king');
+      expect(parseResults.hasCastled).toBeTruthy();
+      expect(parseResults.file).toBe('g');
+      expect(parseResults.rank).toBe(1);
+      parseResults = parseAlgebraicNotation('0-0-0');
+      expect(parseResults.player).toBe('white');
+      expect(parseResults.pieceType).toBe('king');
+      expect(parseResults.hasCastled).toBeTruthy();
+      expect(parseResults.file).toBe('c');
+      expect(parseResults.rank).toBe(1);
+      parseResults = parseAlgebraicNotation('...0-0');
+      expect(parseResults.player).toBe('black');
+      expect(parseResults.pieceType).toBe('king');
+      expect(parseResults.hasCastled).toBeTruthy();
+      expect(parseResults.file).toBe('g');
+      expect(parseResults.rank).toBe(8);
+      parseResults = parseAlgebraicNotation('...0-0-0');
+      expect(parseResults.player).toBe('black');
+      expect(parseResults.pieceType).toBe('king');
+      expect(parseResults.hasCastled).toBeTruthy();
+      expect(parseResults.file).toBe('c');
+      expect(parseResults.rank).toBe(8);
+    });
+
+    it('Test castling notation with check and checkmate', () => {
+      let parseResults = parseAlgebraicNotation('0-0+');
+      expect(parseResults.isCheck).toBeTruthy();
+      parseResults = parseAlgebraicNotation('0-0++');
+      expect(parseResults.isCheckmate).toBeTruthy();
+    });
+  });
+
   describe('File and Rank Notation', () => {
     it('Test each board position\'s notation', () => {
       for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
@@ -217,6 +253,63 @@ describe('Writing Algebraic Notation', () => {
         rankIndex: 4,
       });
       expect(writeResults).toBe('Ba8e4');
+    });
+
+    it('Test white kingside castling notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        fileIndex: 6,
+        hasCastled: true,
+      });
+      expect(writeResults).toBe('0-0');
+    });
+
+    it('Test white queenside castling notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        fileIndex: 2,
+        hasCastled: true,
+      });
+      expect(writeResults).toBe('0-0-0');
+    });
+
+    it('Test black kingside castling notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'black',
+        fileIndex: 6,
+        hasCastled: true,
+      });
+      expect(writeResults).toBe('...0-0');
+    });
+
+    it('Test black queenside castling notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'black',
+        fileIndex: 2,
+        hasCastled: true,
+      });
+      expect(writeResults).toBe('...0-0-0');
+    });
+
+    it('Test castling check notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        fileIndex: 6,
+        hasCastled: true,
+        isCheck: true,
+      });
+      expect(writeResults).toBe('0-0+');
+    });
+
+    it('Test castling checkmate notation', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        fileIndex: 6,
+        hasCastled: true,
+        isCheck: true,
+        isCheckmate: true,
+      });
+      expect(writeResults).toBe('0-0++');
     });
 
     it('Test capture notation', () => {
