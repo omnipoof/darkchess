@@ -11,8 +11,20 @@ import { INITIALIZE_BOARD, SELECT_SQUARE } from '../actions';
 
 const createInitialState = () => {
   const board = createInitialBoard();
+  const pieces = {
+    white: [],
+    black: [],
+  };
+  for (let rankIndex = 0; rankIndex <= 1; rankIndex++) {
+    for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
+      pieces['black'].push(board[fileIndex][rankIndex].piece);
+      pieces['white'].push(board[fileIndex][rankIndex + 6].piece);
+    }
+  }
+
   return {
     board,
+    pieces,
     selectedSquare: null,
     validMoveSquares: [],
     currentPlayer: 'white',
@@ -25,8 +37,8 @@ const createInitialState = () => {
 
 const boardState = (state = createInitialState(), action) => {
 
-  const { board, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history } = state;
-  const newState = { board: cloneBoard(board), selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history }
+  const { board, pieces, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history } = state;
+  const newState = { board: cloneBoard(board), pieces, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history }
   switch (action.type) {
     case INITIALIZE_BOARD:
       return createInitialState();
@@ -68,6 +80,16 @@ const boardState = (state = createInitialState(), action) => {
             move: moveInfo.algebraicNotation,
             board: newState.board,
           });
+
+          const capturedPiece = moveInfo.capturedPiece;
+          if (capturedPiece) {
+            for (let index = 0; index < 16; index++) {
+              const piece = newState.pieces[capturedPiece.player][index];
+              if (piece.id.equals(capturedPiece.id)) {
+                piece.isCaptured = true;
+              }
+            }
+          }
         }
       } else if (square.piece && currentPlayer === square.piece.player) {
         newState.selectedSquare = square;

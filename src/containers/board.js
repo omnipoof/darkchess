@@ -3,9 +3,10 @@ import { selectSquare } from '../actions';
 import BoardComponent from '../components/board';
 
 const mapStateToProps = (state) => {
-    const { boardState: { board, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history } } = state;
+    const { boardState: { board, pieces, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history } } = state;
     return {
         board,
+        pieces,
         selectedSquare,
         validMoveSquares,
         currentPlayer,

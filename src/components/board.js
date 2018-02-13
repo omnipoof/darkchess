@@ -18,7 +18,7 @@ class Board extends Component {
     }
     
     render() {
-        const { board, selectedSquare, currentPlayer, isCheck, isCheckmate, onSelectSquare, history } = this.props;
+        const { board, pieces, selectedSquare, currentPlayer, isCheck, isCheckmate, onSelectSquare, history } = this.props;
         let counter = 0;
         return (
             <div>
@@ -43,6 +43,25 @@ class Board extends Component {
                             </div>
                         )
                     }
+                </div>
+                <div>
+                    <h2>Pieces</h2>
+                    <div>
+                        <b>Black: </b>
+                        {
+                            pieces['black'].map(piece => (
+                                <span style={ { color: piece.isCaptured ? 'red' : 'black' } }>{ piece.type } </span>
+                            ))
+                        }
+                    </div>
+                    <div>
+                        <b>White: </b>
+                        {
+                            pieces['white'].map(piece => (
+                                <span style={ { color: piece.isCaptured ? 'red' : 'black' } }>{ piece.type } </span>
+                            ))
+                        }
+                    </div>
                 </div>
                 <div>
                     <h2>History</h2>
