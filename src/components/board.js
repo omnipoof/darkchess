@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
+import Modal from 'react-overlays/lib/Modal';
 import ObjectID from 'bson-objectid';
 import Square from './square';
 import { reflectBoardForDisplay } from '../utils/boardUtils';
+import PawnPromotionDialog from './PawnPromotionDialog';
 
 class Board extends Component {
-
     isValidMoveSquare(square) {
         const { validMoveSquares } = this.props;
         for (let i = 0; i < validMoveSquares.length; i++) {
@@ -16,10 +17,22 @@ class Board extends Component {
 
         return false;
     }
-    
+
     render() {
-        const { board, pieces, selectedSquare, currentPlayer, isCheck, isCheckmate, onSelectSquare, history } = this.props;
+        const {
+            board,
+            pieces,
+            selectedSquare,
+            currentPlayer,
+            isCheck,
+            isCheckmate,
+            squareToPromote,
+            onSelectSquare,
+            promotePawn,
+            history,
+        } = this.props;
         let counter = 0;
+
         return (
             <div>
                 <div>
@@ -73,6 +86,10 @@ class Board extends Component {
                         ))
                     }
                 </div>
+                <PawnPromotionDialog
+                    show={ squareToPromote }
+                    onChoosePromotion={ pieceType => promotePawn(squareToPromote, pieceType) }
+                />
             </div>
         )
     }

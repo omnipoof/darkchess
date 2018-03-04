@@ -5,9 +5,14 @@ import Bishop from '../components/pieces/Bishop';
 import Queen from '../components/pieces/Queen';
 import King from '../components/pieces/King';
 import { createInitialBoard } from '../utils/boardCreationUtils';
-import { cloneBoard } from '../utils/boardUtils';
+import {
+  cloneBoard,
+  isPlayersKingInCheck,
+  isPlayersKingCheckmated,
+} from '../utils/boardUtils';
+import { parseAlgebraicNotation, writeAlgebraicNotation } from '../utils/algebraicNotation';
 
-import { INITIALIZE_BOARD, SELECT_SQUARE } from '../actions';
+import { INITIALIZE_BOARD, SELECT_SQUARE, PROMOTE_PAWN } from '../actions';
 
 const createInitialState = () => {
   const board = createInitialBoard();
@@ -36,9 +41,9 @@ const createInitialState = () => {
 };
 
 const boardState = (state = createInitialState(), action) => {
-
   const { board, pieces, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history } = state;
   const newState = { board: cloneBoard(board), pieces, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history }
+
   switch (action.type) {
     case INITIALIZE_BOARD:
       return createInitialState();
@@ -60,7 +65,8 @@ const boardState = (state = createInitialState(), action) => {
           newState.selectedSquare = square;
           newState.validMoveSquares = getValidMovesFromSquare(board, square, history);
         } else if (validMoveSquares.some(validMoveSquare => (
-          square.fileIndex === validMoveSquare.fileIndex && square.rankIndex === validMoveSquare.rankIndex
+          square.fileIndex === validMoveSquare.fileIndex &&
+          square.rankIndex === validMoveSquare.rankIndex
         ))) {
           // If a valid move square is selected, move the piece, deselect the square, change players, and update the history
           const moveInfo = selectedSquare.piece.move(
@@ -75,7 +81,6 @@ const boardState = (state = createInitialState(), action) => {
           newState.validMoveSquares = [];
           newState.isCheck = moveInfo.isCheck;
           newState.isCheckmate = moveInfo.isCheckmate;
-          newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
           newState.history.push({
             move: moveInfo.algebraicNotation,
             board: newState.board,
@@ -90,11 +95,52 @@ const boardState = (state = createInitialState(), action) => {
               }
             }
           }
+
+          if (newState.board[square.fileIndex][square.rankIndex].piece.type === 'pawn' &&
+              square.rankIndex === (currentPlayer === 'white' ? 0 : 7)
+          ) {
+            newState.squareToPromote = newState.board[square.fileIndex][square.rankIndex];
+          } else {
+            newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+          }
         }
       } else if (square.piece && currentPlayer === square.piece.player) {
         newState.selectedSquare = square;
         newState.validMoveSquares = getValidMovesFromSquare(board, square, history);
       }
+
+      break;
+    case PROMOTE_PAWN:
+      const { square: { fileIndex, rankIndex }, pieceType } = action;
+      const pawn = newState.board[fileIndex][rankIndex].piece;
+      let newPiece;
+      switch (pieceType) {
+        case 'rook':
+          newPiece = new Rook(currentPlayer);
+          break;
+        case 'knight':
+          newPiece = new Knight(currentPlayer);
+          break;
+        case 'bishop':
+          newPiece = new Bishop(currentPlayer);
+          break;
+        case 'queen':
+          newPiece = new Queen(currentPlayer);
+          break;
+      }
+      newState.board[fileIndex][rankIndex].piece = newPiece;
+      newState.pieces[currentPlayer] = newState.pieces[currentPlayer].map(piece => piece.id === pawn.id ? newPiece : piece);
+      newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+      newState.isCheck = isPlayersKingInCheck(newState.board, newState.history, newState.currentPlayer);
+      newState.isCheckmate = isPlayersKingCheckmated(newState.board, newState.history, newState.currentPlayer);
+      
+      const lastMoveNotation = newState.history.pop().move;
+      const lastMove = parseAlgebraicNotation(lastMoveNotation);
+      lastMove.promotedPieceType = pieceType;
+      newState.history.push({
+        move: writeAlgebraicNotation(lastMove),
+        board: newState.board,
+      });
       break;
   }
 

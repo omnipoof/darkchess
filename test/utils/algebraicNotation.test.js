@@ -135,6 +135,31 @@ describe('Parsing Algebraic Notation', () => {
     });
   });
 
+  describe('Pawn Promotion Notation', () => {
+    it('Test pawn promotion notation', () => {
+      let parseResults = parseAlgebraicNotation('e8Q');
+      expect(parseResults.promotedPieceType).toBe('queen');
+      parseResults = parseAlgebraicNotation('e8B');
+      expect(parseResults.promotedPieceType).toBe('bishop');
+      parseResults = parseAlgebraicNotation('e8N');
+      expect(parseResults.promotedPieceType).toBe('knight');
+      parseResults = parseAlgebraicNotation('e8R');
+      expect(parseResults.promotedPieceType).toBe('rook');
+    });
+
+    it('Test pawn promotion and check notation', () => {
+      const parseResults = parseAlgebraicNotation('e8Q+');
+      expect(parseResults.promotedPieceType).toBe('queen');
+      expect(parseResults.isCheck).toBeTruthy();
+    });
+
+    it('Test pawn promotion and checkmate notation', () => {
+      const parseResults = parseAlgebraicNotation('e8Q++');
+      expect(parseResults.promotedPieceType).toBe('queen');
+      expect(parseResults.isCheckmate).toBeTruthy();
+    });
+  });
+
   describe('File and Rank Notation', () => {
     it('Test each board position\'s notation', () => {
       for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
@@ -154,6 +179,7 @@ describe('Parsing Algebraic Notation', () => {
   describe('Invalid Algebraic Notation', () => {
     it('Test invalid character during file/rank/capture notation parsing', () => {
       try {
+        // Invalid file character (lower bound)
         const previousCharCode = String.fromCharCode('a'.charCodeAt(0) - 1);
         const parseResults = parseAlgebraicNotation(`B${ previousCharCode }5`);
       } catch (e) {
@@ -161,25 +187,50 @@ describe('Parsing Algebraic Notation', () => {
       }
 
       try {
+        // Invalid file character (upper bound)
         const parseResults = parseAlgebraicNotation('Bj5');
       } catch (e) {
         expect(e.startsWith('Invalid')).toBeTruthy();
       }
 
       try {
+        // Invalid space file character
         const parseResults = parseAlgebraicNotation('B 5');
       } catch (e) {
         expect(e.startsWith('Invalid')).toBeTruthy();
       }
 
       try {
+        // Missing file character
+        const parseResults = parseAlgebraicNotation('B5');
+      } catch (e) {
+        expect(e.startsWith('Invalid')).toBeTruthy();
+      }
+
+      try {
+        // Invalid rank character (lower bound)
         const parseResults = parseAlgebraicNotation('Be0');
       } catch (e) {
         expect(e.startsWith('Invalid')).toBeTruthy();
       }
 
       try {
+        // Invalid rank character (upper bound)
         const parseResults = parseAlgebraicNotation('Be9');
+      } catch (e) {
+        expect(e.startsWith('Invalid')).toBeTruthy();
+      }
+
+      try {
+        // Invalid suffix character
+        const parseResults = parseAlgebraicNotation('Be8-');
+      } catch (e) {
+        expect(e.startsWith('Invalid')).toBeTruthy();
+      }
+
+      try {
+        // Invalid pawn promotion piece type
+        const parseResults = parseAlgebraicNotation('e8J');
       } catch (e) {
         expect(e.startsWith('Invalid')).toBeTruthy();
       }
@@ -253,6 +304,17 @@ describe('Writing Algebraic Notation', () => {
         rankIndex: 4,
       });
       expect(writeResults).toBe('Ba8e4');
+    });
+
+    it('Test promoted piece type', () => {
+      const writeResults = writeAlgebraicNotation({
+        player: 'white',
+        pieceType: 'pawn',
+        fileIndex: 0,
+        rankIndex: 0,
+        promotedPieceType: 'queen',
+      });
+      expect(writeResults).toBe('a8Q');
     });
 
     it('Test white kingside castling notation', () => {
@@ -417,6 +479,10 @@ describe('Parsing and Writing Algebraic Notation', () => {
 
   it('Test restoring pawn en passant capture notation', () => {
     expect(writeAlgebraicNotation(parseAlgebraicNotation('exd4e.p.'))).toBe('exd4e.p.');
+  });
+
+  it('Test restoring pawn promotion notation', () => {
+    expect(writeAlgebraicNotation(parseAlgebraicNotation('e5B'))).toBe('e5B');
   });
 
   it('Test restoring check notation', () => {

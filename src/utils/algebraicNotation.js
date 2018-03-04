@@ -23,6 +23,7 @@ export function parseAlgebraicNotation(algebraicNotation) {
   let originRank, originRankIndex;
   let isCapture = false;
   let isEnPassantCapture = false;
+  let promotedPieceType = null;
   let hasCastled = false;
   let isCheck = false;
   let isCheckmate = false;
@@ -72,6 +73,13 @@ export function parseAlgebraicNotation(algebraicNotation) {
       algebraicNotation = algebraicNotation.substr(1);
     }
 
+    // Determine if pawn was promoted
+    character = algebraicNotation.charAt(algebraicNotation.length - 1);
+    if (pieceType === 'pawn' && Object.keys(pieceLetterToTypeMap).includes(character)) {
+      promotedPieceType = pieceLetterToTypeMap[character];
+      algebraicNotation = algebraicNotation.substr(0, algebraicNotation.length - 1);
+    }
+
     algebraicNotation.split('').forEach((character) => {
       if (isFileNotation(character)) {
         if (file) {
@@ -100,6 +108,7 @@ export function parseAlgebraicNotation(algebraicNotation) {
     pieceType,
     isCapture,
     isEnPassantCapture,
+    promotedPieceType,
     hasCastled,
     isCheck,
     isCheckmate,
@@ -118,6 +127,7 @@ export function writeAlgebraicNotation({
   hasCastled,
   isCapture,
   isEnPassantCapture,
+  promotedPieceType,
   isCheck,
   isCheckmate,
   fileIndex,
@@ -139,7 +149,8 @@ export function writeAlgebraicNotation({
   let algebraicNotation;
   if (pieceType === 'pawn') {
     const enPassantCaptureNotation = isEnPassantCapture ? 'e.p.' : '';
-    algebraicNotation = `${ playerPrefix }${ originFile }${ captureNotation }${ file }${ rank }${ enPassantCaptureNotation }${ checkNotation }${ checkmateNotation }`;
+    const promotedPieceTypeNotation = promotedPieceType ? pieceTypeToLetterMap[promotedPieceType] : '';
+    algebraicNotation = `${ playerPrefix }${ originFile }${ captureNotation }${ file }${ rank }${ promotedPieceTypeNotation }${ enPassantCaptureNotation }${ checkNotation }${ checkmateNotation }`;
   } else if (hasCastled) {
     const castlingNotation = fileIndex === 2 ? '0-0-0' : '0-0';
     algebraicNotation = `${ playerPrefix }${ castlingNotation }${ checkNotation }${ checkmateNotation }`;
