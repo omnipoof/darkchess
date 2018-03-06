@@ -6,6 +6,7 @@ import {
   isPlayersKingInCheck,
   isPlayersKingInCheckAfterMove,
   isPlayersKingCheckmated,
+  determineFileRankAmbiguity,
 } from '../../utils/boardUtils';
 
 class Piece {
@@ -40,6 +41,23 @@ class Piece {
   }
 
   move(board, originSquare, destinationSquare, history, isOfficialMove) {
+    let originFileIndex;
+    let originRankIndex;
+    if (isOfficialMove) {
+      const { isFileAmbiguous, isRankAmbiguous } = determineFileRankAmbiguity(
+        board,
+        history,
+        originSquare,
+        destinationSquare,
+      );
+      if (isFileAmbiguous) {
+        originFileIndex = originSquare.fileIndex;
+      }
+      if (isRankAmbiguous) {
+        originRankIndex = originSquare.rankIndex;
+      }
+    }
+
     const capturedPiece = destinationSquare.piece;
     destinationSquare.piece = originSquare.piece;
     originSquare.piece = null;
@@ -51,6 +69,8 @@ class Piece {
       pieceType: this.type,
       fileIndex: destinationSquare.fileIndex,
       rankIndex: destinationSquare.rankIndex,
+      originFileIndex,
+      originRankIndex,
       capturedPiece,
       isCapture: capturedPiece,
       isCheck: isPlayersKingInCheck(board, history, this.player === 'white' ? 'black' : 'white'),

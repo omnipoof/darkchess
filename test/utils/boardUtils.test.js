@@ -9,6 +9,9 @@ import {
   getValidMovesInDirection,
   getValidMovesInDirections,
   getValidMovesForAllPlayersPieces,
+  getSquaresForPlayersOtherSimilarPieces,
+  getValidMovesForPlayersOtherPiecesOfSameType,
+  determineFileRankAmbiguity,
 } from '../../src/utils/boardUtils';
 import {
   createEmptyBoard,
@@ -247,10 +250,85 @@ describe('Board Utils', () => {
       expect(validMoves.length).toBe(10);
     });
 
+    it('Test determining valid moves for player\'s other pieces of the same type', () => {
+      const board = createBoard(['Ra8', 'Rh8', 'Ba1', 'Bh1']);
+      const validMoves = getValidMovesForPlayersOtherPiecesOfSameType(board, [], board[0][0].piece);
+      expect(validMoves.length).toBe(12);
+    });
+
     it('Test determining valid moves for all of a player\'s pieces', () => {
       const board = createBoard(['Ra8', 'Rh8']);
       const validMoves = getValidMovesForAllPlayersPieces(board, [], 'white');
       expect(validMoves.length).toBe(26);
+    });
+  });
+
+  describe('Miscellaneous', () => {
+    it('Test determining squares of player\'s other similar pieces', () => {
+      const board = createBoard(['Ra8', 'Rh8', 'Ra1', 'Rh1']);
+      let squares = getSquaresForPlayersOtherSimilarPieces(board, board[0][0].piece);
+      expect(squares.length).toBe(3);
+      squares.forEach((square) => {
+        square.piece.type === board[0][0].piece.type;
+      });
+    });
+
+    it('Test determining file and rank ambiguity', () => {
+      let board = createBoard(['Ba8', 'Bd8']);
+      let originSquare = board[0][0];
+      let destinationSquare = board[1][1];
+      let ambiguity = determineFileRankAmbiguity(board, [], originSquare, destinationSquare);
+      expect(ambiguity.isFileAmbiguous).toBeFalsy();
+      expect(ambiguity.isRankAmbiguous).toBeFalsy();
+
+      board = createBoard(['Ba8', 'Bc8']);
+      originSquare = board[0][0];
+      destinationSquare = board[1][1];
+      ambiguity = determineFileRankAmbiguity(board, [], originSquare, destinationSquare);
+      expect(ambiguity.isFileAmbiguous).toBeTruthy();
+      expect(ambiguity.isRankAmbiguous).toBeFalsy();
+
+      board = createBoard(['Ba8', 'Ba6']);
+      originSquare = board[0][0];
+      destinationSquare = board[1][1];
+      ambiguity = determineFileRankAmbiguity(board, [], originSquare, destinationSquare);
+      expect(ambiguity.isFileAmbiguous).toBeFalsy();
+      expect(ambiguity.isRankAmbiguous).toBeTruthy();
+
+      board = createBoard(['Ba8', 'Ba6', 'Bc8']);
+      originSquare = board[0][0];
+      destinationSquare = board[1][1];
+      ambiguity = determineFileRankAmbiguity(board, [], originSquare, destinationSquare);
+      expect(ambiguity.isFileAmbiguous).toBeTruthy();
+      expect(ambiguity.isRankAmbiguous).toBeTruthy();
+
+      board = createBoard(['Ra8', 'Ra6']);
+      originSquare = board[0][0];
+      destinationSquare = board[0][1];
+      ambiguity = determineFileRankAmbiguity(board, [], originSquare, destinationSquare);
+      expect(ambiguity.isFileAmbiguous).toBeFalsy();
+      expect(ambiguity.isRankAmbiguous).toBeTruthy();
+
+      board = createBoard(['Ra8', 'Rc8']);
+      originSquare = board[0][0];
+      destinationSquare = board[1][0];
+      ambiguity = determineFileRankAmbiguity(board, [], originSquare, destinationSquare);
+      expect(ambiguity.isFileAmbiguous).toBeTruthy();
+      expect(ambiguity.isRankAmbiguous).toBeFalsy();
+
+      board = createBoard(['Ra8', 'Rc6']);
+      originSquare = board[0][0];
+      destinationSquare = board[0][2];
+      ambiguity = determineFileRankAmbiguity(board, [], originSquare, destinationSquare);
+      expect(ambiguity.isFileAmbiguous).toBeTruthy();
+      expect(ambiguity.isRankAmbiguous).toBeFalsy();
+
+      board = createBoard(['Ra8', 'Ra4', 'Rc6']);
+      originSquare = board[0][0];
+      destinationSquare = board[0][2];
+      ambiguity = determineFileRankAmbiguity(board, [], originSquare, destinationSquare);
+      expect(ambiguity.isFileAmbiguous).toBeTruthy();
+      expect(ambiguity.isRankAmbiguous).toBeTruthy();
     });
   });
 });

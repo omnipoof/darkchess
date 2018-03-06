@@ -131,4 +131,36 @@ describe('Board > Piece', () => {
     expect(moveInfo.isCheck).toBeTruthy();
     expect(moveInfo.isCheckmate).toBeFalsy();
   });
+
+  it('Test moving piece with another piece in the same file', () => {
+    const board = createBoard(['Rb7', 'Rb5']);
+    const moveResults = performMoves(board, ['b7b6']);
+    const moveInfo = parseAlgebraicNotation(moveResults.history[1].move);
+    expect(moveInfo.originFileIndex).toBeFalsy();
+    expect(moveInfo.originRankIndex).toBe(1);
+  });
+
+  it('Test moving piece with another piece in the same rank', () => {
+    const board = createBoard(['Rb7', 'Rd7']);
+    const moveResults = performMoves(board, ['b7c7']);
+    const moveInfo = parseAlgebraicNotation(moveResults.history[1].move);
+    expect(moveInfo.originFileIndex).toBe(1);
+    expect(moveInfo.originRankIndex).toBeFalsy();
+  });
+
+  it('Test moving piece with another piece not in the same file or rank that can move there too', () => {
+    const board = createBoard(['Rb7', 'Rc6']);
+    const moveResults = performMoves(board, ['b7b6']);
+    const moveInfo = parseAlgebraicNotation(moveResults.history[1].move);
+    expect(moveInfo.originFileIndex).toBe(1);
+    expect(moveInfo.originRankIndex).toBeFalsy();
+  });
+
+  it('Test moving piece with several pieces that can move there too', () => {
+    const board = createBoard(['Rb7', 'Rb5', 'Rc6']);
+    const moveResults = performMoves(board, ['b7b6']);
+    const moveInfo = parseAlgebraicNotation(moveResults.history[1].move);
+    expect(moveInfo.originFileIndex).toBe(1);
+    expect(moveInfo.originRankIndex).toBe(1);
+  });
 });

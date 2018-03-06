@@ -87,6 +87,38 @@ export const getValidMovesInDirections = (board, position, directions, currentPl
   return validMoves;
 };
 
+export const getSquaresForPlayersOtherSimilarPieces = (board, basePiece) => {
+  const squares = [];
+  for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
+    for (let rankIndex = 0; rankIndex < 8; rankIndex++) {
+      const square = board[fileIndex][rankIndex];
+      const piece = square.piece;
+      if (piece &&
+          piece.player === basePiece.player &&
+          piece.type === basePiece.type &&
+          piece.id !== basePiece.id) {
+        squares.push(square);
+      }
+    }
+  }
+
+  return squares;
+}
+
+export const getValidMovesForPlayersOtherPiecesOfSameType = (board, history, piece) => {
+  let allValidMoves = [];
+  const otherPieceSquares = getSquaresForPlayersOtherSimilarPieces(board, piece);
+  otherPieceSquares.forEach((square) => {
+    allValidMoves = allValidMoves.concat(square.piece.getValidMoves(board, square, history).map((validMove) => (
+      {
+        originSquare: square,
+        destinationSquare: validMove,
+      }
+    )))
+  });
+  return allValidMoves;
+}
+
 export const getValidMovesForAllPlayersPieces = (board, history, player) => {
   let allValidMoves = [];
   for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
@@ -106,6 +138,37 @@ export const getValidMovesForAllPlayersPieces = (board, history, player) => {
 
   return allValidMoves;
 };
+
+export const determineFileRankAmbiguity = (board, history, originSquare, destinationSquare) => {
+  const piece = board[originSquare.fileIndex][originSquare.rankIndex].piece;
+  const otherValidMoves = getValidMovesForPlayersOtherPiecesOfSameType(board, history, piece);
+  const otherValidMovesWithSameDestination = otherValidMoves.filter((validMove) => {
+    return validMove.destinationSquare.fileIndex === destinationSquare.fileIndex &&
+      validMove.destinationSquare.rankIndex === destinationSquare.rankIndex;
+  });
+
+  // The file is ambiguous if there is another same-type piece that can move here in the same file
+  let isFileAmbiguous = otherValidMovesWithSameDestination.some((validMove) => {
+    return validMove.originSquare.fileIndex !== originSquare.fileIndex;
+  });
+  // The rank is ambiguous if there is another same-type piece that can move here in the same rank
+  let isRankAmbiguous = otherValidMovesWithSameDestination.some((validMove) => {
+    return validMove.originSquare.rankIndex !== originSquare.rankIndex;
+  });
+
+  if (isFileAmbiguous && isRankAmbiguous) {
+    // If there are only two same-type pieces that can move here, we only need the file to disambiguate
+    if (otherValidMovesWithSameDestination.length === 1) {
+      isRankAmbiguous = false;
+    }
+    // Otherwise, we will need both the file and rank to disambiguate three or more same-type pieces
+  }
+
+  return {
+    isFileAmbiguous,
+    isRankAmbiguous,
+  }
+}
 
 export const getPlayersKingSquare = (board, player) => {
   for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
