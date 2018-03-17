@@ -10,6 +10,7 @@ import {
   isPlayersKingInCheck,
   isPlayersKingCheckmated,
 } from '../utils/boardUtils';
+import { promotePawn } from '../utils/pieceUtils';
 import { parseAlgebraicNotation, writeAlgebraicNotation } from '../utils/algebraicNotation';
 
 import { INITIALIZE_BOARD, SELECT_SQUARE, PROMOTE_PAWN } from '../actions';
@@ -111,36 +112,23 @@ const boardState = (state = createInitialState(), action) => {
 
       break;
     case PROMOTE_PAWN:
+      // Promote the pawn on the given square
       const { square: { fileIndex, rankIndex }, pieceType } = action;
       const pawn = newState.board[fileIndex][rankIndex].piece;
-      let newPiece;
-      switch (pieceType) {
-        case 'rook':
-          newPiece = new Rook(currentPlayer);
-          break;
-        case 'knight':
-          newPiece = new Knight(currentPlayer);
-          break;
-        case 'bishop':
-          newPiece = new Bishop(currentPlayer);
-          break;
-        case 'queen':
-          newPiece = new Queen(currentPlayer);
-          break;
-      }
-      newState.board[fileIndex][rankIndex].piece = newPiece;
+      promotePawn(newState.board, newState.history, newState.board[fileIndex][rankIndex], pieceType);
+
+      // Update the piece management collection
+      const newPiece = newState.board[fileIndex][rankIndex].piece;
       newState.pieces[currentPlayer] = newState.pieces[currentPlayer].map(piece => piece.id === pawn.id ? newPiece : piece);
+
+      // Get whether the opponent's king is in check or checkmate
+      const algebraicNotation = newState.history[newState.history.length - 1].move;
+      const moveInfo = parseAlgebraicNotation(algebraicNotation);
+      newState.isCheck = moveInfo.isCheck;
+      newState.isCheckmate = moveInfo.isCheckmate;
+
+      // Switch to the next player
       newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
-      newState.isCheck = isPlayersKingInCheck(newState.board, newState.history, newState.currentPlayer);
-      newState.isCheckmate = isPlayersKingCheckmated(newState.board, newState.history, newState.currentPlayer);
-      
-      const lastMoveNotation = newState.history.pop().move;
-      const lastMove = parseAlgebraicNotation(lastMoveNotation);
-      lastMove.promotedPieceType = pieceType;
-      newState.history.push({
-        move: writeAlgebraicNotation(lastMove),
-        board: newState.board,
-      });
       break;
   }
 

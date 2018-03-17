@@ -9,9 +9,13 @@ import {
   getValidMovesInDirection,
   getValidMovesInDirections,
   getValidMovesForAllPlayersPieces,
+  getSquaresForPlayersPieces,
   getSquaresForPlayersOtherSimilarPieces,
   getValidMovesForPlayersOtherPiecesOfSameType,
   determineFileRankAmbiguity,
+  isPlayersKingInCheck,
+  isPlayersKingInCheckAfterMove,
+  isPlayersKingCheckmated,
 } from '../../src/utils/boardUtils';
 import {
   createEmptyBoard,
@@ -263,13 +267,135 @@ describe('Board Utils', () => {
     });
   });
 
+  describe('Determine Check and Checkmate Scenarios', () => {
+    it('Test determining if player\'s king is in check', () => {
+      let board = createBoard(['a8', '...Kh8']);
+      let history = [{
+        move: 'Start',
+        board: createBoard(['a7', '...Kh8']),
+      }, {
+        move: 'a8',
+        board,
+      }];
+      expect(isPlayersKingInCheck(board, history, 'black')).toBeFalsy();
+
+      board = createBoard(['Ra8', '...Kh8']);
+      history = [{
+        move: 'Start',
+        board: createBoard(['Ra7', '...Kh8']),
+      }, {
+        move: 'Ra8',
+        board,
+      }];
+      expect(isPlayersKingInCheck(board, history, 'black')).toBeTruthy();
+    });
+
+    it('Ensure \'false\' is returned for check if player does not have a king on the board', () => {
+      let board = createBoard(['a8']);
+      let history = [{
+        move: 'Start',
+        board: createBoard(['a7']),
+      }, {
+        move: 'a8',
+        board,
+      }];
+      expect(isPlayersKingInCheck(board, history, 'black')).toBeFalsy();
+    });
+    
+    it('Test determining if player\'s king is in check after move', () => {
+      let board = createBoard(['a7', '...Kh8']);
+      let history = [{
+        move: 'Start',
+        board,
+      }];
+      let originSquare = board[0][1];
+      let destinationSquare = board[0][0];
+      expect(isPlayersKingInCheckAfterMove(
+        originSquare,
+        destinationSquare,
+        board,
+        history,
+        'black'
+      )).toBeFalsy();
+      
+      board = createBoard(['Ra7', '...Kh8']);
+      history = [{
+        move: 'Start',
+        board,
+      }];
+      originSquare = board[0][1];
+      destinationSquare = board[0][0];
+      expect(isPlayersKingInCheckAfterMove(
+        originSquare,
+        destinationSquare,
+        board,
+        history,
+        'black'
+      )).toBeTruthy();
+    });
+
+    it('Test determining if player\'s king is checkmated', () => {
+      let board = createBoard(['a8', 'Rb7', '...Kh8']);
+      let history = [{
+        move: 'Start',
+        board: createBoard(['a7', 'Rb7', '...Kh8']),
+      }, {
+        move: 'a8',
+        board,
+      }];
+      expect(isPlayersKingCheckmated(board, history, 'black')).toBeFalsy();
+
+      board = createBoard(['Ra8', 'Rb7', '...Kh8']);
+      history = [{
+        move: 'Start',
+        board: createBoard(['Ra7', 'Rb7', '...Kh8']),
+      }, {
+        move: 'Ra8',
+        board,
+      }];
+      expect(isPlayersKingCheckmated(board, history, 'black')).toBeTruthy();
+    });
+
+    it('Ensure \'false\' is returned for checkmate if player does not have a king on the board', () => {
+      let board = createBoard(['Ra8', 'Rb7']);
+      let history = [{
+        move: 'Start',
+        board: createBoard(['Ra7', 'Rb7']),
+      }, {
+        move: 'Ra8',
+        board,
+      }];
+      expect(isPlayersKingCheckmated(board, history, 'black')).toBeFalsy();
+    });
+
+    it('Ensure \'false\' is returned for checkmate if king is on board but there are no valid moves', () => {
+      let board = createBoard(['Kf7', 'Qg6', '...Kh8']);
+      let history = [{
+        move: 'Start',
+        board,
+      }];
+      expect(isPlayersKingCheckmated(board, history, 'black')).toBeFalsy();
+    });
+  });
+
   describe('Miscellaneous', () => {
+    it('Test determining squares for player\'s pieces of a given type', () => {
+      const board = createInitialBoard();
+      const squares = getSquaresForPlayersPieces(board, 'white', 'pawn');
+      expect(squares.length).toBe(8);
+      squares.forEach((square) => {
+        expect(square.piece.type).toBe('pawn');
+      });
+    });
+
     it('Test determining squares of player\'s other similar pieces', () => {
       const board = createBoard(['Ra8', 'Rh8', 'Ra1', 'Rh1']);
-      let squares = getSquaresForPlayersOtherSimilarPieces(board, board[0][0].piece);
+      const basePiece = board[0][0].piece;
+      const squares = getSquaresForPlayersOtherSimilarPieces(board, basePiece);
       expect(squares.length).toBe(3);
       squares.forEach((square) => {
-        square.piece.type === board[0][0].piece.type;
+        expect(square.piece.type).toBe(basePiece.type);
+        expect(square.piece.id).not.toBe(basePiece.id);
       });
     });
 

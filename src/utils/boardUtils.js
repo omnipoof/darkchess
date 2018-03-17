@@ -87,29 +87,33 @@ export const getValidMovesInDirections = (board, position, directions, currentPl
   return validMoves;
 };
 
-export const getSquaresForPlayersOtherSimilarPieces = (board, basePiece) => {
+export const getSquaresForPlayersPieces = (board, player, pieceType) => {
   const squares = [];
   for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
     for (let rankIndex = 0; rankIndex < 8; rankIndex++) {
       const square = board[fileIndex][rankIndex];
       const piece = square.piece;
       if (piece &&
-          piece.player === basePiece.player &&
-          piece.type === basePiece.type &&
-          piece.id !== basePiece.id) {
+          piece.player === player &&
+          piece.type === pieceType) {
         squares.push(square);
       }
     }
   }
 
   return squares;
-}
+};
 
-export const getValidMovesForPlayersOtherPiecesOfSameType = (board, history, piece) => {
+export const getSquaresForPlayersOtherSimilarPieces = (board, basePiece) => {
+  const squares = getSquaresForPlayersPieces(board, basePiece.player, basePiece.type);
+  return squares.filter(({ piece }) => piece.id !== basePiece.id);
+};
+
+export const getValidMovesForPlayersOtherPiecesOfSameType = (board, history, piece, filterCheckMoves) => {
   let allValidMoves = [];
   const otherPieceSquares = getSquaresForPlayersOtherSimilarPieces(board, piece);
   otherPieceSquares.forEach((square) => {
-    allValidMoves = allValidMoves.concat(square.piece.getValidMoves(board, square, history).map((validMove) => (
+    allValidMoves = allValidMoves.concat(square.piece.getValidMoves(board, square, history, filterCheckMoves).map((validMove) => (
       {
         originSquare: square,
         destinationSquare: validMove,
@@ -119,19 +123,21 @@ export const getValidMovesForPlayersOtherPiecesOfSameType = (board, history, pie
   return allValidMoves;
 }
 
-export const getValidMovesForAllPlayersPieces = (board, history, player) => {
+export const getValidMovesForAllPlayersPieces = (board, history, player, filterCheckMoves) => {
   let allValidMoves = [];
   for (let fileIndex = 0; fileIndex < 8; fileIndex++) {
     for (let rankIndex = 0; rankIndex < 8; rankIndex++) {
       const square = board[fileIndex][rankIndex];
       const piece = square.piece;
       if (piece && piece.player === player) {
-        allValidMoves = allValidMoves.concat(piece.getValidMoves(board, square, history).map((validMove) => (
-          {
-            originSquare: square,
-            destinationSquare: validMove,
-          }
-        )));
+        allValidMoves = allValidMoves.concat(
+          piece.getValidMoves(board, square, history, filterCheckMoves).map((validMove) => (
+            {
+              originSquare: square,
+              destinationSquare: validMove,
+            }
+          ))
+        );
       }
     }
   }
@@ -147,11 +153,11 @@ export const determineFileRankAmbiguity = (board, history, originSquare, destina
       validMove.destinationSquare.rankIndex === destinationSquare.rankIndex;
   });
 
-  // The file is ambiguous if there is another same-type piece that can move here in the same file
+  // The file is ambiguous if there is another same-type piece that can move here with a different file
   let isFileAmbiguous = otherValidMovesWithSameDestination.some((validMove) => {
     return validMove.originSquare.fileIndex !== originSquare.fileIndex;
   });
-  // The rank is ambiguous if there is another same-type piece that can move here in the same rank
+  // The rank is ambiguous if there is another same-type piece that can move here with a different rank
   let isRankAmbiguous = otherValidMovesWithSameDestination.some((validMove) => {
     return validMove.originSquare.rankIndex !== originSquare.rankIndex;
   });
@@ -187,7 +193,7 @@ export const getPlayersKingSquare = (board, player) => {
 export const isPlayersKingInCheck = (board, history, player) => {
   // Find if opponent's king's square is a valid move for any of the current player's pieces
   const kingSquare = getPlayersKingSquare(board, player);
-  if (kingSquare) { // King may not be present during testing
+  if (kingSquare) { // The king may not be present during testing
     const opponent = player === 'white' ? 'black' : 'white';
     const allValidMoves = getValidMovesForAllPlayersPieces(board, history, opponent);
     return allValidMoves.some((validMove) => (
@@ -210,7 +216,12 @@ export const isPlayersKingInCheckAfterMove = (originSquare, destinationSquare, b
 
 export const isPlayersKingCheckmated = (board, history, player) => {
   const allValidMoves = getValidMovesForAllPlayersPieces(board, history, player);
-  return allValidMoves.length === 0 || allValidMoves.every(({ originSquare, destinationSquare }) => {
-    return isPlayersKingInCheckAfterMove(originSquare, destinationSquare, board, history, player);
-  });
-}
+  if (allValidMoves.length === 0) {
+    // The king may not be present during testing
+    return false;
+  }
+  return isPlayersKingInCheck(board, history, player) &&
+    allValidMoves.every(({ originSquare, destinationSquare }) => (
+      isPlayersKingInCheckAfterMove(originSquare, destinationSquare, board, history, player)
+    ));
+};

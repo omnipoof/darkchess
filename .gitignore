@@ -22,3 +22,6 @@ yarn-error.log*
 
 # jest test coverage
 /test/coverage
+
+# VS Code configurations
+/.vscode/*
