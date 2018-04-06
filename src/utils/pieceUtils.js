@@ -10,11 +10,11 @@ import {
   parseAlgebraicNotation,
   writeAlgebraicNotation,
 } from './algebraicNotation';
-import { getBoardAsString } from './testUtils';
 
 export const promotePawn = (board, history, pawnSquare, pieceType) => {
   const { fileIndex, rankIndex } = pawnSquare;
-  const { player } = board[fileIndex][rankIndex].piece;
+  const pawn = board[fileIndex][rankIndex].piece;
+  const { player } = pawn;
 
   // Create the new piece and replace the pawn with it
   let newPiece;
@@ -31,13 +31,15 @@ export const promotePawn = (board, history, pawnSquare, pieceType) => {
     case 'queen':
       newPiece = new Queen(player);
       break;
+    default:
+      newPiece = pawn;
   }
   board[fileIndex][rankIndex].piece = newPiece;
 
   // Update the history to reflect the promotion
   const lastMoveNotation = history.pop().move;
   const lastMove = parseAlgebraicNotation(lastMoveNotation);
-  lastMove.promotedPieceType = pieceType;
+  lastMove.promotedPieceType = newPiece.type !== 'pawn' && pieceType;
   history.push({
     move: writeAlgebraicNotation(lastMove),
     board,

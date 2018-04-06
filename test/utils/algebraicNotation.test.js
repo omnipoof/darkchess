@@ -181,58 +181,58 @@ describe('Parsing Algebraic Notation', () => {
       try {
         // Invalid file character (lower bound)
         const previousCharCode = String.fromCharCode('a'.charCodeAt(0) - 1);
-        const parseResults = parseAlgebraicNotation(`B${ previousCharCode }5`);
+        parseAlgebraicNotation(`B${ previousCharCode }5`);
       } catch (e) {
-        expect(e.startsWith('Invalid')).toBeTruthy();
+        expect(e.message.startsWith('Invalid')).toBeTruthy();
       }
 
       try {
         // Invalid file character (upper bound)
-        const parseResults = parseAlgebraicNotation('Bj5');
+        parseAlgebraicNotation('Bj5');
       } catch (e) {
-        expect(e.startsWith('Invalid')).toBeTruthy();
+        expect(e.message.startsWith('Invalid')).toBeTruthy();
       }
 
       try {
         // Invalid space file character
-        const parseResults = parseAlgebraicNotation('B 5');
+        parseAlgebraicNotation('B 5');
       } catch (e) {
-        expect(e.startsWith('Invalid')).toBeTruthy();
+        expect(e.message.startsWith('Invalid')).toBeTruthy();
       }
 
       try {
         // Missing file character
-        const parseResults = parseAlgebraicNotation('B5');
+        parseAlgebraicNotation('B5');
       } catch (e) {
-        expect(e.startsWith('Invalid')).toBeTruthy();
+        expect(e.message.startsWith('Invalid')).toBeTruthy();
       }
 
       try {
         // Invalid rank character (lower bound)
-        const parseResults = parseAlgebraicNotation('Be0');
+        parseAlgebraicNotation('Be0');
       } catch (e) {
-        expect(e.startsWith('Invalid')).toBeTruthy();
+        expect(e.message.startsWith('Invalid')).toBeTruthy();
       }
 
       try {
         // Invalid rank character (upper bound)
-        const parseResults = parseAlgebraicNotation('Be9');
+        parseAlgebraicNotation('Be9');
       } catch (e) {
-        expect(e.startsWith('Invalid')).toBeTruthy();
+        expect(e.message.startsWith('Invalid')).toBeTruthy();
       }
 
       try {
         // Invalid suffix character
-        const parseResults = parseAlgebraicNotation('Be8-');
+        parseAlgebraicNotation('Be8-');
       } catch (e) {
-        expect(e.startsWith('Invalid')).toBeTruthy();
+        expect(e.message.startsWith('Invalid')).toBeTruthy();
       }
 
       try {
         // Invalid pawn promotion piece type
-        const parseResults = parseAlgebraicNotation('e8J');
+        parseAlgebraicNotation('e8J');
       } catch (e) {
-        expect(e.startsWith('Invalid')).toBeTruthy();
+        expect(e.message.startsWith('Invalid')).toBeTruthy();
       }
     });
   });

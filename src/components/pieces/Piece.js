@@ -1,8 +1,6 @@
 import ObjectID from 'bson-objectid';
 import { writeAlgebraicNotation } from '../../utils/algebraicNotation';
 import {
-  cloneBoard,
-  getPlayersKingSquare,
   isPlayersKingInCheck,
   isPlayersKingInCheckAfterMove,
   isPlayersKingCheckmated,
@@ -48,7 +46,7 @@ class Piece {
         board,
         history,
         originSquare,
-        destinationSquare,
+        destinationSquare
       );
       if (isFileAmbiguous) {
         originFileIndex = originSquare.fileIndex;

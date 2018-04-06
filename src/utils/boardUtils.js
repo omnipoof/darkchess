@@ -19,20 +19,20 @@ export const reflectBoardForDisplay = (board) => {
   let fileIndex, rankIndex;
   const newBoard = Array(8);
   for (fileIndex = 0; fileIndex < 8; fileIndex++) {
-      newBoard[fileIndex] = Array(8);
-      for (rankIndex = 0; rankIndex < 8; rankIndex++) {
-          newBoard[fileIndex][rankIndex] = null;
-      }
+    newBoard[fileIndex] = Array(8);
+    for (rankIndex = 0; rankIndex < 8; rankIndex++) {
+      newBoard[fileIndex][rankIndex] = null;
+    }
   }
 
   for (fileIndex = 0; fileIndex < 8; fileIndex++) {
-      for (rankIndex = 0; rankIndex < 8; rankIndex++) {
-          newBoard[rankIndex][fileIndex] = board[fileIndex][rankIndex];
-      }
+    for (rankIndex = 0; rankIndex < 8; rankIndex++) {
+      newBoard[rankIndex][fileIndex] = board[fileIndex][rankIndex];
+    }
   }
 
   return newBoard;
-}
+};
 
 export const isPositionOnBoard = (position) => {
   const { fileIndex, rankIndex } = position;
@@ -118,10 +118,10 @@ export const getValidMovesForPlayersOtherPiecesOfSameType = (board, history, pie
         originSquare: square,
         destinationSquare: validMove,
       }
-    )))
+    )));
   });
   return allValidMoves;
-}
+};
 
 export const getValidMovesForAllPlayersPieces = (board, history, player, filterCheckMoves) => {
   let allValidMoves = [];
@@ -173,8 +173,8 @@ export const determineFileRankAmbiguity = (board, history, originSquare, destina
   return {
     isFileAmbiguous,
     isRankAmbiguous,
-  }
-}
+  };
+};
 
 export const getPlayersKingSquare = (board, player) => {
   for (let fileIndex = 0; fileIndex < 8; fileIndex++) {

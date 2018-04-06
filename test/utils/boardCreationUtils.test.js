@@ -2,7 +2,6 @@ import {
   boardSize,
   createEmptyBoard,
   createInitialBoard,
-  createBoard,
 } from '../../src/utils/boardCreationUtils';
 
 describe('Board Creation Utils', () => {

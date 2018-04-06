@@ -11,16 +11,13 @@ Object.keys(pieceLetterToTypeMap).forEach(key => pieceTypeToLetterMap[pieceLette
 
 export function parseAlgebraicNotation(algebraicNotation) {
 
-  // String cursor position
-  let position = -1;
-
   // Potential values obtained from the remaining characters
   let player = 'white';
   let pieceType= 'pawn';
   let file, fileIndex;
   let rank, rankIndex;
-  let originFile, originFileIndex;
-  let originRank, originRankIndex;
+  let originFileIndex;
+  let originRankIndex;
   let isCapture = false;
   let isEnPassantCapture = false;
   let promotedPieceType = null;
@@ -83,14 +80,12 @@ export function parseAlgebraicNotation(algebraicNotation) {
     algebraicNotation.split('').forEach((character) => {
       if (isFileNotation(character)) {
         if (file) {
-          originFile = file;
           originFileIndex = fileIndex;
         }
         file = character;
         fileIndex = getFileIndex(file);
       } else if (isRankNotation(character)) {
         if (rank) {
-          originRank = rank;
           originRankIndex = rankIndex;
         }
         rank = parseRank(character);
@@ -98,7 +93,7 @@ export function parseAlgebraicNotation(algebraicNotation) {
       } else if (isCaptureNotation(character)) {
         isCapture = true;
       } else {
-        throw `Invalid Algebraic Notation: Expected file, rank, or capture notation; found '${ character }' instead`;
+        throw new Error(`Invalid Algebraic Notation: Expected file, rank, or capture notation; found '${ character }' instead`);
       }
     });
   }
@@ -167,12 +162,12 @@ const isFileNotation = (character) => {
   const aCharCode = 'a'.charCodeAt(0);
   const hCharCode = 'h'.charCodeAt(0);
   return charCode >= aCharCode && charCode <= hCharCode;
-}
+};
 
 const isRankNotation = (character) => {
   const value = parseInt(character, 10);
   return Number.isInteger(value) && value >= 1 && value <= 8;
-}
+};
 
 const isCaptureNotation = (character) => {
   return character === 'x';
@@ -180,12 +175,12 @@ const isCaptureNotation = (character) => {
 
 const parseRank = (character) => {
   return parseInt(character, 10);
-}
+};
 
 const getFileIndex = (file) => {
   return file.charCodeAt(0) - 'a'.charCodeAt(0);
-}
+};
 
 const getRankIndex = (rank) => {
   return 8 - rank;
-}
+};

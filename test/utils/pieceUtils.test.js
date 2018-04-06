@@ -1,6 +1,5 @@
 import { createBoard } from '../../src/utils/boardCreationUtils';
 import { promotePawn } from '../../src/utils/pieceUtils';
-import { getBoardAsString } from '../../src/utils/testUtils';
 
 describe('Piece Utils', () => {
   describe('Pawn Promotion', () => {
@@ -44,6 +43,12 @@ describe('Piece Utils', () => {
         promotePawn(board, history, pawnSquare, 'queen');
         expect(pawnSquare.piece.type).toBe('queen');
         expect(history.pop().move).toBe('a8Q');
+      });
+
+      it('Test promoting to invalid piece', () => {
+        promotePawn(board, history, pawnSquare, 'biscuit');
+        expect(pawnSquare.piece.type).toBe('pawn');
+        expect(history.pop().move).toBe('a8');
       });
 
       it('Test promoting a black piece', () => {

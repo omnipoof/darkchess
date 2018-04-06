@@ -1,5 +1,4 @@
 import { createEmptyBoard, createInitialBoard, createBoard } from '../../../src/utils/boardCreationUtils';
-import { cloneBoard } from '../../../src/utils/boardUtils';
 import { performMoves } from '../../../src/utils/testUtils';
 import Pawn from '../../../src/components/pieces/Pawn';
 

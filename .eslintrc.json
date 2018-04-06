@@ -1,11 +1,11 @@
 {
     "env": {
         "browser": true,
-        "es6": true
+        "es6": true,
+        "jest": true
     },
     "extends": "eslint:recommended",
     "parserOptions": {
-        "ecmaVersion": 6,
         "sourceType": "module",
         "ecmaFeatures": {
             "jsx": true
@@ -15,9 +15,28 @@
         "react"
     ],
     "rules": {
+        "react/jsx-uses-react": [
+            "error"
+        ],
+        "react/jsx-uses-vars": [
+            "error"
+        ],
         "indent": [
             "error",
-            2
+            2,
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "comma-dangle": [
+            "error",
+            {
+                "arrays": "always-multiline",
+                "objects": "always-multiline",
+                "imports": "always-multiline",
+                "exports": "always-multiline",
+                "functions": "only-multiline"
+            }
         ],
         "linebreak-style": [
             "error",
@@ -30,6 +49,9 @@
         "semi": [
             "error",
             "always"
+        ],
+        "default-case": [
+            "error"
         ]
     }
 }

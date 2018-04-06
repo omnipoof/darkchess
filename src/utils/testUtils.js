@@ -73,7 +73,7 @@ export const performMoves = (initialBoard, moves) => {
   return {
     board,
     history,
-  }
+  };
 };
 
 export const getBoardAsString = (board) => {

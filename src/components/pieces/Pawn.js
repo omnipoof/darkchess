@@ -22,7 +22,7 @@ export default class Pawn extends Piece {
     const getPiece = (position) => {
       const { fileIndex, rankIndex } = position;
       return board[fileIndex][rankIndex].piece;
-    }
+    };
 
     const isPositionOccupied = (position) => {
       return getPiece(position) !== null;
@@ -55,7 +55,7 @@ export default class Pawn extends Piece {
           return lastMovedPawn.id === pieceInPawnInitialPosition.id && lastMovedPawn.id === opponentPawn.id;
         }
       }
-    }
+    };
         
     const verticalDirection = this.player === 'black' ? DOWN : UP;
     const validMoves = [];
@@ -90,7 +90,7 @@ export default class Pawn extends Piece {
         && getPiece(nextPosition).type === 'pawn'
         && didOpponentMovePawnTwoSquares(getPiece(nextPosition))
     ) {
-      validMoves.push(getAdjacentPosition(position, LEFT | verticalDirection))
+      validMoves.push(getAdjacentPosition(position, LEFT | verticalDirection));
     }
 
     nextPosition = getAdjacentPosition(position, RIGHT);
@@ -100,7 +100,7 @@ export default class Pawn extends Piece {
         && getPiece(nextPosition).type === 'pawn'
         && didOpponentMovePawnTwoSquares(getPiece(nextPosition))
     ) {
-      validMoves.push(getAdjacentPosition(position, RIGHT | verticalDirection))
+      validMoves.push(getAdjacentPosition(position, RIGHT | verticalDirection));
     }
 
     return validMoves;

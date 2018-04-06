@@ -1,7 +1,5 @@
-import { createBoard, createInitialBoard } from '../../../src/utils/boardCreationUtils';
+import { createInitialBoard } from '../../../src/utils/boardCreationUtils';
 import { performMoves } from '../../../src/utils/testUtils';
-import { parseAlgebraicNotation } from '../../../src/utils/algebraicNotation';
-import King from '../../../src/components/pieces/King';
 
 describe('Board > Piece > King', () => {
   it('Test determining standard valid move scenarios', () => {

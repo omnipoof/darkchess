@@ -1,4 +1,5 @@
 import { createInitialBoard } from '../../src/utils/boardCreationUtils';
+import { parseAlgebraicNotation } from '../../src/utils/algebraicNotation';
 import { performMoves, getBoardAsString } from '../../src/utils/testUtils';
 
 describe('Test Utils', () => {
@@ -50,7 +51,7 @@ describe('Test Utils', () => {
       'R3f2',
     ]);
     const boardString = getBoardAsString(moveResults.board);
-    expect(boardString).toBe(' ABCDEFGH\n8---Q-KN-\n7RBN-----\n6--------\n5P-PP-b--\n4P------n\n3r-------\n2-ppppr-p\n1-nbq-rk-')
+    expect(boardString).toBe(' ABCDEFGH\n8---Q-KN-\n7RBN-----\n6--------\n5P-PP-b--\n4P------n\n3r-------\n2-ppppr-p\n1-nbq-rk-');
   });
 
   it('Perform pawn promotion into a checkmate state', () => {
@@ -68,7 +69,8 @@ describe('Test Utils', () => {
       '...Nd5',
       'gxh8Q++',
     ]);
-
+    const lastMove = parseAlgebraicNotation(moveResults.history.pop().move);
+    expect(lastMove.isCheckmate).toBeTruthy();
   });
 
   it('Get board as string', () => {

@@ -14,7 +14,7 @@ class TestPiece extends Piece {
 describe('Board > Piece', () => {
   it('Test instantiating subclass piece', () => {
     try {
-      const piece = new Queen('white');
+      new Queen('white');
     } catch (e) {
       expect(e).toBeFalsy();
     }
@@ -22,7 +22,7 @@ describe('Board > Piece', () => {
 
   it('Test instantiating abstract piece', () => {
     try {
-      const piece = new Piece('bishop', 'white');
+      new Piece('bishop', 'white');
     } catch (e) {
       expect(e).toBeTruthy();
       expect(e.message).toBe('Piece is an abstract class and cannot be instantiated.');
@@ -31,7 +31,7 @@ describe('Board > Piece', () => {
 
   it('Test instantiating piece without getValidMoves', () => {
     try {
-      const piece = new TestPiece('white');
+      new TestPiece('white');
     } catch (e) {
       expect(e).toBeTruthy();
       expect(e.message).toBe('getOptimisticValidMoves is an abstract method and must be implemented.');

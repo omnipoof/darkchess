@@ -1,98 +1,55 @@
 import React, { Component } from 'react';
-import Modal from 'react-overlays/lib/Modal';
-import ObjectID from 'bson-objectid';
-import Square from './square';
-import { reflectBoardForDisplay } from '../utils/boardUtils';
-import PawnPromotionDialog from './PawnPromotionDialog';
+import Square from './Square';
+import './Board.css';
 
 class Board extends Component {
-    isValidMoveSquare(square) {
-        const { validMoveSquares } = this.props;
-        for (let i = 0; i < validMoveSquares.length; i++) {
-            const validMoveSquare = validMoveSquares[i];
-            if (validMoveSquare.fileIndex === square.fileIndex && validMoveSquare.rankIndex === square.rankIndex) {
-                return true;
-            }
-        }
-
-        return false;
+  isValidMoveSquare(square) {
+    const { validMoveSquares } = this.props;
+    for (let i = 0; i < validMoveSquares.length; i++) {
+      const validMoveSquare = validMoveSquares[i];
+      if (validMoveSquare.fileIndex === square.fileIndex && validMoveSquare.rankIndex === square.rankIndex) {
+        return true;
+      }
     }
 
-    render() {
-        const {
-            board,
-            pieces,
-            selectedSquare,
-            currentPlayer,
-            isCheck,
-            isCheckmate,
-            squareToPromote,
-            onSelectSquare,
-            promotePawn,
-            history,
-        } = this.props;
-        let counter = 0;
+    return false;
+  }
 
-        return (
-            <div>
-                <div>
-                    <h1>Current Player: { currentPlayer === 'white' ? 'White' : 'Black' }</h1>
-                </div>
-                <div>
-                    {
-                        reflectBoardForDisplay(board).map(rank =>
-                            <div key={counter++}>
-                                {rank.map((square) =>
-                                    <Square
-                                        key={counter++}
-                                        square={ square }
-                                        isSelected={ selectedSquare && square.fileIndex === selectedSquare.fileIndex && square.rankIndex === selectedSquare.rankIndex }
-                                        isChecked={ isCheck && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
-                                        isCheckmated={ isCheckmate && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
-                                        isHighlighted={ this.isValidMoveSquare(square) }
-                                        onSelectSquare={ () => onSelectSquare(board, selectedSquare, square) }
-                                    />
-                                )}
-                            </div>
-                        )
-                    }
-                </div>
-                <div>
-                    <h2>Pieces</h2>
-                    <div>
-                        <b>Black: </b>
-                        {
-                            pieces['black'].map(piece => (
-                                <span style={ { color: piece.isCaptured ? 'red' : 'black' } }>{ piece.type } </span>
-                            ))
-                        }
-                    </div>
-                    <div>
-                        <b>White: </b>
-                        {
-                            pieces['white'].map(piece => (
-                                <span style={ { color: piece.isCaptured ? 'red' : 'black' } }>{ piece.type } </span>
-                            ))
-                        }
-                    </div>
-                </div>
-                <div>
-                    <h2>History</h2>
-                    {
-                        history.map(historicalState => (
-                            <div key={ ObjectID() }>
-                                { historicalState.move }
-                            </div>
-                        ))
-                    }
-                </div>
-                <PawnPromotionDialog
-                    show={ squareToPromote }
-                    onChoosePromotion={ pieceType => promotePawn(squareToPromote, pieceType) }
-                />
+  render() {
+    const {
+      board,
+      selectedSquare,
+      currentPlayer,
+      isCheck,
+      isCheckmate,
+      onSelectSquare,
+    } = this.props;
+    let counter = 0;
+
+    return (
+      <div className="board">
+        {
+          board.map(rank =>
+            <div key={counter++}>
+              {
+                rank.map((square) =>
+                  <Square
+                    key={counter++}
+                    square={ square }
+                    isSelected={ selectedSquare && square.fileIndex === selectedSquare.fileIndex && square.rankIndex === selectedSquare.rankIndex }
+                    isChecked={ isCheck && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
+                    isCheckmated={ isCheckmate && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
+                    isHighlighted={ this.isValidMoveSquare(square) }
+                    onSelectSquare={ () => onSelectSquare(board, selectedSquare, square, currentPlayer) }
+                  />
+                )
+              }
             </div>
-        )
-    }
+          )
+        }
+      </div>
+    );
+  }
 }
 
 export default Board;

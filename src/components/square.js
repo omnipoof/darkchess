@@ -1,31 +1,45 @@
 import React from 'react';
+import classNames from 'classnames';
+import _ from 'lodash';
+import { getPieceImage } from '../utils/renderUtils';
+import './Square.css';
 
-const getIcon = (piece) => {
-  return require(`../images/pieces/${ piece.player }/${ piece.type }.svg`);
-};
+
 
 const Square = ({
-  square,
+  square: {
+    fileIndex,
+    rankIndex,
+    piece,
+  },
   isSelected,
   isChecked,
   isCheckmated,
   isHighlighted,
   onSelectSquare,
 }) => {
-  const piece = square.piece;
-  const icon = piece ? getIcon(piece) : null;
-  const classNames = 'square' + (isSelected ? ' selected' : '') + (isHighlighted ? ' highlighted' : '') + (isChecked ? ' checked' : '') + (isCheckmated ? ' checkmated' : '');
-  const file = String.fromCharCode('a'.charCodeAt(0) + square.fileIndex);
-  const rank = 8 - square.rankIndex;
+  const icon = piece ? getPieceImage(piece) : null;
+  const variant = (rankIndex % 2 + fileIndex) % 2;
 
   return (
-    <button className={ classNames } onClick={ onSelectSquare }>
+    <span
+      className={ classNames(
+        'square',
+        variant ? 'variant1' : 'variant2',
+        {
+          'selected': isSelected,
+          'highlighted': isHighlighted,
+          'checked': isChecked,
+          'checkmated': isCheckmated,
+        }
+      ) }
+      onClick={ onSelectSquare }
+    >
       {
-        piece ?
-          <img title={ piece.type } alt={ piece.player + '.' + piece.type } src={ icon } width='32px' height='32px' /> :
-          <div style={ { fontWeight: 'bold' } }>{ file }{ rank }</div>
+        piece &&
+        <img className="piece" title={ _.startCase(piece.type) } alt={ piece.player + '.' + piece.type } src={ icon } />
       }
-    </button>
+    </span>
   );
 };
 

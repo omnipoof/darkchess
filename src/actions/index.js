@@ -24,5 +24,5 @@ export const promotePawn = (square, pieceType) => {
     type: PROMOTE_PAWN,
     square,
     pieceType,
-  }
-}
+  };
+};

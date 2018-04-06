@@ -3,7 +3,6 @@ import {
   LEFT,
   RIGHT,
   DOWN,
-  boardSize,
   isPositionLandable,
   getAdjacentPosition,
   getValidMovesInDirection,
@@ -184,7 +183,7 @@ describe('Board Utils', () => {
         DOWN | RIGHT,
         'white',
         false,
-        validMoves,
+        validMoves
       );
       expect(validMoves.length).toBe(1);
       const validMove = validMoves[0];
@@ -201,7 +200,7 @@ describe('Board Utils', () => {
         DOWN | RIGHT,
         'white',
         true,
-        validMoves,
+        validMoves
       );
       expect(validMoves.length).toBe(7);
       validMoves.forEach((validMove, index) => {
@@ -219,7 +218,7 @@ describe('Board Utils', () => {
         DOWN | RIGHT,
         'white',
         true,
-        validMoves,
+        validMoves
       );
       expect(validMoves.length).toBe(2);
     });
@@ -233,7 +232,7 @@ describe('Board Utils', () => {
         DOWN | RIGHT,
         'white',
         true,
-        validMoves,
+        validMoves
       );
       expect(validMoves.length).toBe(1);
     });
@@ -249,7 +248,7 @@ describe('Board Utils', () => {
           DOWN | LEFT,
           DOWN | RIGHT,
         ],
-        'white',
+        'white'
       );
       expect(validMoves.length).toBe(10);
     });

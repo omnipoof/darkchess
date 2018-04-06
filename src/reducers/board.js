@@ -1,17 +1,7 @@
-import Pawn from '../components/pieces/Pawn';
-import Rook from '../components/pieces/Rook';
-import Knight from '../components/pieces/Knight';
-import Bishop from '../components/pieces/Bishop';
-import Queen from '../components/pieces/Queen';
-import King from '../components/pieces/King';
 import { createInitialBoard } from '../utils/boardCreationUtils';
-import {
-  cloneBoard,
-  isPlayersKingInCheck,
-  isPlayersKingCheckmated,
-} from '../utils/boardUtils';
+import { cloneBoard } from '../utils/boardUtils';
 import { promotePawn } from '../utils/pieceUtils';
-import { parseAlgebraicNotation, writeAlgebraicNotation } from '../utils/algebraicNotation';
+import { parseAlgebraicNotation } from '../utils/algebraicNotation';
 
 import { INITIALIZE_BOARD, SELECT_SQUARE, PROMOTE_PAWN } from '../actions';
 
@@ -38,17 +28,17 @@ const createInitialState = () => {
       move: 'Start',
       board,
     }],
-  }
+  };
 };
 
 const boardState = (state = createInitialState(), action) => {
   const { board, pieces, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history } = state;
-  const newState = { board: cloneBoard(board), pieces, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history }
+  const newState = { board: cloneBoard(board), pieces, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history };
 
   switch (action.type) {
     case INITIALIZE_BOARD:
       return createInitialState();
-    case SELECT_SQUARE:
+    case SELECT_SQUARE: {
       if (isCheckmate) {
         break;
       }
@@ -111,7 +101,8 @@ const boardState = (state = createInitialState(), action) => {
       }
 
       break;
-    case PROMOTE_PAWN:
+    }
+    case PROMOTE_PAWN: {
       // Promote the pawn on the given square
       const { square: { fileIndex, rankIndex }, pieceType } = action;
       const pawn = newState.board[fileIndex][rankIndex].piece;
@@ -130,32 +121,12 @@ const boardState = (state = createInitialState(), action) => {
       // Switch to the next player
       newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
       break;
+    }
+    default:
+      // No default
   }
 
   return newState;
-};
-
-const updateBoardPositions = (action) => {
-  let { board, previousSelectedSquare, square } = action;
-  if (previousSelectedSquare) {
-    board = board.map(array => array.slice());
-    board[square.column][square.row].piece = previousSelectedSquare.piece;
-    board[previousSelectedSquare.column][previousSelectedSquare.row].piece = null;
-  }
-
-  return board;
-};
-
-const toggleSquareSelection = (selectedSquare, square) => {
-  if (selectedSquare && selectedSquare.column === square.column && selectedSquare.row === square.row) {
-    return null;
-  }
-
-  if (square.piece === null) {
-    return null;
-  }
-
-  return square;
 };
 
 const getValidMovesFromSquare = (board, square, history) => {
