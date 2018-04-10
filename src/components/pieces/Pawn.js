@@ -63,23 +63,43 @@ export default class Pawn extends Piece {
     // Check if moving one square is possible
     let nextPosition = getAdjacentPosition(position, verticalDirection);
     if (nextPosition && !isPositionOccupied(nextPosition)) {
-      validMoves.push(nextPosition);
+      validMoves.push({
+        originFileIndex: position.fileIndex,
+        originRankIndex: position.rankIndex,
+        destinationFileIndex: nextPosition.fileIndex,
+        destinationRankIndex: nextPosition.rankIndex,
+      });
       // Check if a two square initial move is possible
       nextPosition = getAdjacentPosition(nextPosition, verticalDirection);
       if (!this.hasMoved && !isPositionOccupied(nextPosition)) {
-        validMoves.push(nextPosition);
+        validMoves.push({
+          originFileIndex: position.fileIndex,
+          originRankIndex: position.rankIndex,
+          destinationFileIndex: nextPosition.fileIndex,
+          destinationRankIndex: nextPosition.rankIndex,
+        });
       }
     }
 
     // Check if the pawn can capture diagonally
     nextPosition = getAdjacentPosition(position, LEFT | verticalDirection);
     if (nextPosition && isPositionOccupiedByOpponent(nextPosition)) {
-      validMoves.push(nextPosition);
+      validMoves.push({
+        originFileIndex: position.fileIndex,
+        originRankIndex: position.rankIndex,
+        destinationFileIndex: nextPosition.fileIndex,
+        destinationRankIndex: nextPosition.rankIndex,
+      });
     }
 
     nextPosition = getAdjacentPosition(position, RIGHT | verticalDirection);
     if (nextPosition && isPositionOccupiedByOpponent(nextPosition)) {
-      validMoves.push(nextPosition);
+      validMoves.push({
+        originFileIndex: position.fileIndex,
+        originRankIndex: position.rankIndex,
+        destinationFileIndex: nextPosition.fileIndex,
+        destinationRankIndex: nextPosition.rankIndex,
+      });
     }
 
     // Check if the pawn can capture en passant
@@ -90,7 +110,13 @@ export default class Pawn extends Piece {
         && getPiece(nextPosition).type === 'pawn'
         && didOpponentMovePawnTwoSquares(getPiece(nextPosition))
     ) {
-      validMoves.push(getAdjacentPosition(position, LEFT | verticalDirection));
+      const adjacentPosition = getAdjacentPosition(position, LEFT | verticalDirection);
+      validMoves.push({
+        originFileIndex: position.fileIndex,
+        originRankIndex: position.rankIndex,
+        destinationFileIndex: adjacentPosition.fileIndex,
+        destinationRankIndex: adjacentPosition.rankIndex,
+      });
     }
 
     nextPosition = getAdjacentPosition(position, RIGHT);
@@ -100,7 +126,13 @@ export default class Pawn extends Piece {
         && getPiece(nextPosition).type === 'pawn'
         && didOpponentMovePawnTwoSquares(getPiece(nextPosition))
     ) {
-      validMoves.push(getAdjacentPosition(position, RIGHT | verticalDirection));
+      const adjacentPosition = getAdjacentPosition(position, RIGHT | verticalDirection);
+      validMoves.push({
+        originFileIndex: position.fileIndex,
+        originRankIndex: position.rankIndex,
+        destinationFileIndex: adjacentPosition.fileIndex,
+        destinationRankIndex: adjacentPosition.rankIndex,
+      });
     }
 
     return validMoves;

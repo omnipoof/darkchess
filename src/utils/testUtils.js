@@ -49,7 +49,7 @@ export const performMoves = (initialBoard, moves) => {
 
         const validMoves = square.piece.getValidMoves(board, square, history, true);
         return validMoves.some(validMove => (
-          validMove.fileIndex === fileIndex && validMove.rankIndex === rankIndex
+          validMove.destinationFileIndex === fileIndex && validMove.destinationRankIndex === rankIndex
         ));
       });
 

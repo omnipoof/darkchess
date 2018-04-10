@@ -26,7 +26,12 @@ export default class Knight extends Piece {
 
     newPositions.forEach((newPosition) => {
       if (isPositionLandable(board, newPosition, this.player)) {
-        validMoves.push(newPosition);
+        validMoves.push({
+          originFileIndex: position.fileIndex,
+          originRankIndex: position.rankIndex,
+          destinationFileIndex: newPosition.fileIndex,
+          destinationRankIndex: newPosition.rankIndex,
+        });
       }
     });
 

@@ -7,7 +7,7 @@ class Board extends Component {
     const { validMoveSquares } = this.props;
     for (let i = 0; i < validMoveSquares.length; i++) {
       const validMoveSquare = validMoveSquares[i];
-      if (validMoveSquare.fileIndex === square.fileIndex && validMoveSquare.rankIndex === square.rankIndex) {
+      if (validMoveSquare.destinationFileIndex === square.fileIndex && validMoveSquare.destinationRankIndex === square.rankIndex) {
         return true;
       }
     }

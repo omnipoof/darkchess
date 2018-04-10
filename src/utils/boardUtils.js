@@ -61,15 +61,20 @@ export const getAdjacentPosition = (position, direction) => {
   return isPositionOnBoard(newPosition) ? newPosition : null;
 };
 
-export const getValidMovesInDirection = (board, currentPosition, direction, currentPlayer, recurse, validMoves) => {
+export const getValidMovesInDirection = (board, originPosition, currentPosition, direction, currentPlayer, recurse, validMoves) => {
   
   const nextPosition = getAdjacentPosition(currentPosition, direction);
   if (nextPosition !== null) {
     const square = board[nextPosition.fileIndex][nextPosition.rankIndex];
     if (isPositionLandable(board, nextPosition, currentPlayer)) {
-      validMoves.push(nextPosition);
+      validMoves.push({
+        originFileIndex: originPosition.fileIndex,
+        originRankIndex: originPosition.rankIndex,
+        destinationFileIndex: nextPosition.fileIndex,
+        destinationRankIndex: nextPosition.rankIndex,
+      });
       if (recurse && square.piece === null) {
-        return getValidMovesInDirection(board, nextPosition, direction, currentPlayer, recurse, validMoves);
+        return getValidMovesInDirection(board, originPosition, nextPosition, direction, currentPlayer, recurse, validMoves);
       }
     }
   }
@@ -81,7 +86,7 @@ export const getValidMovesInDirections = (board, position, directions, currentPl
 
   const validMoves = [];
   directions.forEach((direction) => {
-    getValidMovesInDirection(board, position, direction, currentPlayer, recurse, validMoves);
+    getValidMovesInDirection(board, position, position, direction, currentPlayer, recurse, validMoves);
   });
 
   return validMoves;
@@ -113,12 +118,7 @@ export const getValidMovesForPlayersOtherPiecesOfSameType = (board, history, pie
   let allValidMoves = [];
   const otherPieceSquares = getSquaresForPlayersOtherSimilarPieces(board, piece);
   otherPieceSquares.forEach((square) => {
-    allValidMoves = allValidMoves.concat(square.piece.getValidMoves(board, square, history, filterCheckMoves).map((validMove) => (
-      {
-        originSquare: square,
-        destinationSquare: validMove,
-      }
-    )));
+    allValidMoves = allValidMoves.concat(square.piece.getValidMoves(board, square, history, filterCheckMoves));
   });
   return allValidMoves;
 };
@@ -131,12 +131,7 @@ export const getValidMovesForAllPlayersPieces = (board, history, player, filterC
       const piece = square.piece;
       if (piece && piece.player === player) {
         allValidMoves = allValidMoves.concat(
-          piece.getValidMoves(board, square, history, filterCheckMoves).map((validMove) => (
-            {
-              originSquare: square,
-              destinationSquare: validMove,
-            }
-          ))
+          piece.getValidMoves(board, square, history, filterCheckMoves)
         );
       }
     }
@@ -149,17 +144,17 @@ export const determineFileRankAmbiguity = (board, history, originSquare, destina
   const piece = board[originSquare.fileIndex][originSquare.rankIndex].piece;
   const otherValidMoves = getValidMovesForPlayersOtherPiecesOfSameType(board, history, piece);
   const otherValidMovesWithSameDestination = otherValidMoves.filter((validMove) => {
-    return validMove.destinationSquare.fileIndex === destinationSquare.fileIndex &&
-      validMove.destinationSquare.rankIndex === destinationSquare.rankIndex;
+    return validMove.destinationFileIndex === destinationSquare.fileIndex &&
+      validMove.destinationRankIndex === destinationSquare.rankIndex;
   });
 
   // The file is ambiguous if there is another same-type piece that can move here with a different file
   let isFileAmbiguous = otherValidMovesWithSameDestination.some((validMove) => {
-    return validMove.originSquare.fileIndex !== originSquare.fileIndex;
+    return validMove.originFileIndex !== originSquare.fileIndex;
   });
   // The rank is ambiguous if there is another same-type piece that can move here with a different rank
   let isRankAmbiguous = otherValidMovesWithSameDestination.some((validMove) => {
-    return validMove.originSquare.rankIndex !== originSquare.rankIndex;
+    return validMove.originRankIndex !== originSquare.rankIndex;
   });
 
   if (isFileAmbiguous && isRankAmbiguous) {
@@ -197,20 +192,20 @@ export const isPlayersKingInCheck = (board, history, player) => {
     const opponent = player === 'white' ? 'black' : 'white';
     const allValidMoves = getValidMovesForAllPlayersPieces(board, history, opponent);
     return allValidMoves.some((validMove) => (
-      validMove.destinationSquare.fileIndex === kingSquare.fileIndex &&
-      validMove.destinationSquare.rankIndex === kingSquare.rankIndex
+      validMove.destinationFileIndex === kingSquare.fileIndex &&
+      validMove.destinationRankIndex === kingSquare.rankIndex
     ));
   }
 
   return false;
 };
 
-export const isPlayersKingInCheckAfterMove = (originSquare, destinationSquare, board, history, player) => {
+export const isPlayersKingInCheckAfterMove = (originFileIndex, originRankIndex, destinationFileIndex, destinationRankIndex, board, history, player) => {
   const clonedBoard = cloneBoard(board);
-  const clonedOriginSquare = clonedBoard[originSquare.fileIndex][originSquare.rankIndex];
-  const clonedDestinationSquare = clonedBoard[destinationSquare.fileIndex][destinationSquare.rankIndex];
+  const clonedOriginSquare = clonedBoard[originFileIndex][originRankIndex];
+  const clonedDestinationSquare = clonedBoard[destinationFileIndex][destinationRankIndex];
   const clonedHistory = history.slice();
-  const moveInfo = originSquare.piece.move(clonedBoard, clonedOriginSquare, clonedDestinationSquare, clonedHistory);
+  const moveInfo = clonedOriginSquare.piece.move(clonedBoard, clonedOriginSquare, clonedDestinationSquare, clonedHistory);
   return isPlayersKingInCheck(moveInfo.board, history, player);
 };
 
@@ -221,7 +216,15 @@ export const isPlayersKingCheckmated = (board, history, player) => {
     return false;
   }
   return isPlayersKingInCheck(board, history, player) &&
-    allValidMoves.every(({ originSquare, destinationSquare }) => (
-      isPlayersKingInCheckAfterMove(originSquare, destinationSquare, board, history, player)
+    allValidMoves.every(({ originFileIndex, originRankIndex, destinationFileIndex, destinationRankIndex }) => (
+      isPlayersKingInCheckAfterMove(
+        originFileIndex,
+        originRankIndex,
+        destinationFileIndex,
+        destinationRankIndex,
+        board,
+        history,
+        player
+      )
     ));
 };

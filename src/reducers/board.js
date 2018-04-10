@@ -56,8 +56,8 @@ const boardState = (state = createInitialState(), action) => {
           newState.selectedSquare = square;
           newState.validMoveSquares = getValidMovesFromSquare(board, square, history);
         } else if (validMoveSquares.some(validMoveSquare => (
-          square.fileIndex === validMoveSquare.fileIndex &&
-          square.rankIndex === validMoveSquare.rankIndex
+          square.fileIndex === validMoveSquare.destinationFileIndex &&
+          square.rankIndex === validMoveSquare.destinationRankIndex
         ))) {
           // If a valid move square is selected, move the piece, deselect the square, change players, and update the history
           const moveInfo = selectedSquare.piece.move(

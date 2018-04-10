@@ -46,11 +46,11 @@ export default class King extends Piece {
     }
 
     const opponentsValidMoves = getValidMovesForAllPlayersPieces(board, history, this.player === 'white' ? 'black' : 'white');
-    return !opponentsValidMoves.some(({ destinationSquare }) => (
+    return !opponentsValidMoves.some(({ destinationFileIndex, destinationRankIndex }) => (
       // Cannot castle if the king moves through or lands on a square that's in check (5, 6)
-      destinationSquare.rankIndex === kingRankIndex && (
-        destinationSquare.fileIndex === kingFileIndex + (withQueenSideRook ? -1 : 1) ||
-        destinationSquare.fileIndex === kingFileIndex + (withQueenSideRook ? -2 : 2)
+      destinationRankIndex === kingRankIndex && (
+        destinationFileIndex === kingFileIndex + (withQueenSideRook ? -1 : 1) ||
+        destinationFileIndex === kingFileIndex + (withQueenSideRook ? -2 : 2)
       )
     ));
   }
@@ -72,15 +72,19 @@ export default class King extends Piece {
     // Check for castling valid moves
     if (this.canCastle(true, board, history)) {
       validMoves.push({
-        fileIndex: 2,
-        rankIndex: position.rankIndex,
+        originFileIndex: position.fileIndex,
+        originRankIndex: position.rankIndex,
+        destinationFileIndex: 2,
+        destinationRankIndex: position.rankIndex,
       });
     }
 
     if (this.canCastle(false, board, history)) {
       validMoves.push({
-        fileIndex: 6,
-        rankIndex: position.rankIndex,
+        originFileIndex: position.fileIndex,
+        originRankIndex: position.rankIndex,
+        destinationFileIndex: 6,
+        destinationRankIndex: position.rankIndex,
       });
     }
 

@@ -32,7 +32,15 @@ class Piece {
     let validMoves = this.getOptimisticValidMoves(board, originSquare, history);
     if (filterCheckMoves) {
       validMoves = validMoves.filter((validMove) => (
-        !isPlayersKingInCheckAfterMove(originSquare, validMove, board, history, this.player)
+        !isPlayersKingInCheckAfterMove(
+          validMove.originFileIndex,
+          validMove.originRankIndex,
+          validMove.destinationFileIndex,
+          validMove.destinationRankIndex,
+          board,
+          history,
+          this.player
+        )
       ));
     }
     return validMoves;

@@ -176,10 +176,15 @@ describe('Board Utils', () => {
 
     it('Test determining valid move without recursion', () => {
       const board = createEmptyBoard();
+      const originSquare = {
+        fileIndex: 0,
+        rankIndex: 0,
+      };
       const validMoves = [];
       getValidMovesInDirection(
         board,
-        { fileIndex: 0, rankIndex: 0 },
+        originSquare, // origin position
+        originSquare, // current position
         DOWN | RIGHT,
         'white',
         false,
@@ -187,16 +192,21 @@ describe('Board Utils', () => {
       );
       expect(validMoves.length).toBe(1);
       const validMove = validMoves[0];
-      expect(validMove.fileIndex).toBe(1);
-      expect(validMove.rankIndex).toBe(1);
+      expect(validMove.destinationFileIndex).toBe(1);
+      expect(validMove.destinationRankIndex).toBe(1);
     });
 
     it('Test determining valid moves with recursion', () => {
       const board = createEmptyBoard();
+      const originSquare = {
+        fileIndex: 0,
+        rankIndex: 0,
+      };
       const validMoves = [];
       getValidMovesInDirection(
         board,
-        { fileIndex: 0, rankIndex: 0 },
+        originSquare, // origin position
+        originSquare, // current position
         DOWN | RIGHT,
         'white',
         true,
@@ -204,17 +214,22 @@ describe('Board Utils', () => {
       );
       expect(validMoves.length).toBe(7);
       validMoves.forEach((validMove, index) => {
-        expect(validMove.fileIndex).toBe(1 + index);
-        expect(validMove.rankIndex).toBe(1 + index);
+        expect(validMove.destinationFileIndex).toBe(1 + index);
+        expect(validMove.destinationRankIndex).toBe(1 + index);
       });
     });
 
     it('Test encountering opponent\'s piece ends recursion inclusively', () => {
       const board = createBoard(['...c6']);
+      const originSquare = {
+        fileIndex: 0,
+        rankIndex: 0,
+      };
       const validMoves = [];
       getValidMovesInDirection(
         board,
-        { fileIndex: 0, rankIndex: 0 },
+        originSquare, // origin position
+        originSquare, // current position
         DOWN | RIGHT,
         'white',
         true,
@@ -225,10 +240,15 @@ describe('Board Utils', () => {
 
     it('Test encountering player\'s piece ends recursion exclusively', () => {
       const board = createBoard(['c6']);
+      const originSquare = {
+        fileIndex: 0,
+        rankIndex: 0,
+      };
       const validMoves = [];
       getValidMovesInDirection(
         board,
-        { fileIndex: 0, rankIndex: 0 },
+        originSquare, // origin position
+        originSquare, // current position
         DOWN | RIGHT,
         'white',
         true,
@@ -310,8 +330,10 @@ describe('Board Utils', () => {
       let originSquare = board[0][1];
       let destinationSquare = board[0][0];
       expect(isPlayersKingInCheckAfterMove(
-        originSquare,
-        destinationSquare,
+        originSquare.fileIndex,
+        originSquare.rankIndex,
+        destinationSquare.fileIndex,
+        destinationSquare.rankIndex,
         board,
         history,
         'black'
@@ -325,8 +347,10 @@ describe('Board Utils', () => {
       originSquare = board[0][1];
       destinationSquare = board[0][0];
       expect(isPlayersKingInCheckAfterMove(
-        originSquare,
-        destinationSquare,
+        originSquare.fileIndex,
+        originSquare.rankIndex,
+        destinationSquare.fileIndex,
+        destinationSquare.rankIndex,
         board,
         history,
         'black'
