@@ -55,7 +55,7 @@ export default class King extends Piece {
     ));
   }
 
-  getOptimisticValidMoves(board, position, history) {
+  getOptimisticValidMoves(board, position, history, isOfficialRequest) {
 
     const directions = [
       UP | LEFT,
@@ -70,7 +70,7 @@ export default class King extends Piece {
     const validMoves = getValidMovesInDirections(board, position, directions, this.player, false);
 
     // Check for castling valid moves
-    if (this.canCastle(true, board, history)) {
+    if (isOfficialRequest && this.canCastle(true, board, history)) {
       validMoves.push({
         originFileIndex: position.fileIndex,
         originRankIndex: position.rankIndex,
@@ -79,7 +79,7 @@ export default class King extends Piece {
       });
     }
 
-    if (this.canCastle(false, board, history)) {
+    if (isOfficialRequest && this.canCastle(false, board, history)) {
       validMoves.push({
         originFileIndex: position.fileIndex,
         originRankIndex: position.rankIndex,

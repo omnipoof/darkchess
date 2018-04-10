@@ -28,9 +28,9 @@ class Piece {
     }
   }
 
-  getValidMoves(board, originSquare, history, filterCheckMoves) {
-    let validMoves = this.getOptimisticValidMoves(board, originSquare, history);
-    if (filterCheckMoves) {
+  getValidMoves(board, originSquare, history, isOfficialRequest) {
+    let validMoves = this.getOptimisticValidMoves(board, originSquare, history, isOfficialRequest);
+    if (isOfficialRequest) {
       validMoves = validMoves.filter((validMove) => (
         !isPlayersKingInCheckAfterMove(
           validMove.originFileIndex,
