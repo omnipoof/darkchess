@@ -55,7 +55,7 @@ const PawnPromotionDialog = ({
 
   return (
     <Modal
-      show={ true }//show }
+      show={ show }
       style={ modalStyle }
       backdropStyle={ backdropStyle }
     >
