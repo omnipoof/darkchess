@@ -58,6 +58,7 @@ class Game extends Component {
         </div>
         <PawnPromotionDialog
           show={ squareToPromote }
+          player={ currentPlayer }
           onChoosePromotion={ pieceType => promotePawn(squareToPromote, pieceType) }
         />
       </div>

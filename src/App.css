@@ -1,3 +1,7 @@
+@font-face {
+  font-family: 'Palanquin';
+  src: url('fonts/palanquin-regular-webfont.woff') format('woff');
+}
 html,
 body {
   margin: 0;
