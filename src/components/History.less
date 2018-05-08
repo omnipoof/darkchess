@@ -1,16 +1,11 @@
 .history {
   background-color: white;
-  width: 170px;
-  height: 502px;
+  width: 250px;
+  height: ~"calc(100vh - 25px)";
   overflow-y: auto;
   padding: 5px 10px;
   border: 2px solid black;
   font-family: 'Palanquin';
-
-  position: relative;
-  top: 0;
-  bottom: 0;
-  left: 0;
 
   .title {
     font-weight: 700;
@@ -37,5 +32,12 @@
         }
       }
     }
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .history {
+    width: ~"calc(100vw - 35px)";
+    max-width: ~"calc(100vh - 35px)";
   }
 }

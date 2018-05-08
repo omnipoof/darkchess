@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import classNames from 'classnames';
 import Square from './Square';
 import './Board.css';
 
@@ -17,6 +18,7 @@ class Board extends Component {
 
   render() {
     const {
+      className,
       board,
       selectedSquare,
       currentPlayer,
@@ -27,21 +29,23 @@ class Board extends Component {
     let counter = 0;
 
     return (
-      <div className="board">
+      <div className={ classNames(className, 'board') }>
         {
           board.map(rank =>
-            <div key={counter++}>
+            <div key={counter++} className="file">
               {
                 rank.map((square) =>
-                  <Square
-                    key={counter++}
-                    square={ square }
-                    isSelected={ selectedSquare && square.fileIndex === selectedSquare.fileIndex && square.rankIndex === selectedSquare.rankIndex }
-                    isChecked={ isCheck && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
-                    isCheckmated={ isCheckmate && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
-                    isHighlighted={ this.isValidMoveSquare(square) }
-                    onSelectSquare={ () => onSelectSquare(board, selectedSquare, square, currentPlayer) }
-                  />
+                  <div className="rank">
+                    <Square
+                      key={counter++}
+                      square={ square }
+                      isSelected={ selectedSquare && square.fileIndex === selectedSquare.fileIndex && square.rankIndex === selectedSquare.rankIndex }
+                      isChecked={ isCheck && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
+                      isCheckmated={ isCheckmate && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
+                      isHighlighted={ this.isValidMoveSquare(square) }
+                      onSelectSquare={ () => onSelectSquare(board, selectedSquare, square, currentPlayer) }
+                    />
+                  </div>
                 )
               }
             </div>

@@ -2,15 +2,12 @@ import React, { Component } from 'react';
 import PawnPromotionDialog from './PawnPromotionDialog';
 import './Game.css';
 import Board from './Board';
-import PlayerIndicator from './PlayerIndicator';
-import PieceTracker from './PieceTracker';
 import History from './History';
 
 class Game extends Component {
   render() {
     const {
       board,
-      pieces,
       selectedSquare,
       validMoveSquares,
       currentPlayer,
@@ -26,22 +23,8 @@ class Game extends Component {
       <div className="page">
         <div className="content">
           <div className="core">
-            <div className="information">
-              <PieceTracker
-                className="tracker"
-                pieces={ pieces }
-                player={ 'black' }
-              />
-              <PlayerIndicator
-                currentPlayer={ currentPlayer }
-              />
-              <PieceTracker
-                className="tracker"
-                pieces={ pieces }
-                player={ 'white' }
-              />
-            </div>
             <Board
+              className="boardComponent"
               board={ board }
               selectedSquare={ selectedSquare }
               currentPlayer={ currentPlayer }
@@ -51,7 +34,7 @@ class Game extends Component {
               validMoveSquares={ validMoveSquares }
             />
             <History
-              className="history"
+              className="historyComponent"
               history={ history }
             />
           </div>

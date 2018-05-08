@@ -20,6 +20,18 @@ describe('Board > Piece > King', () => {
     expect(validMoves.length).toBe(3);
   });
 
+  it('Test determining kingside castling on first move (branch coverage)', () => {
+    const board = createInitialBoard();
+    const history = [{
+      move: 'Start',
+      board,
+    }];
+    const originSquare = board[4][7];
+    const king = originSquare.piece;
+    const validMoves = king.getValidMoves(board, originSquare, history, true);
+    expect(validMoves.length).toBe(0);
+  });
+
   it('Test determining kingside castling valid move scenario', () => {
     const board = createInitialBoard();
     const moveResults = performMoves(board, [
