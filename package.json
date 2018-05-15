@@ -36,9 +36,5 @@
     "react-overlays": "^0.8.3",
     "react-test-renderer": "^15.6.1",
     "redux-devtools": "^3.4.0"
-  },
-  "jest": {
-    "collectCoverage": true,
-    "coverageDirectory": "./test/coverage"
   }
 }
