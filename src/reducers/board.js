@@ -1,5 +1,5 @@
 import { createInitialBoard } from '../utils/boardCreationUtils';
-import { cloneBoard } from '../utils/boardUtils';
+import { cloneBoard, getValidMovesForAllPlayersPieces } from '../utils/boardUtils';
 import { promotePawn } from '../utils/pieceUtils';
 import { parseAlgebraicNotation } from '../utils/algebraicNotation';
 
@@ -7,6 +7,11 @@ import { INITIALIZE_BOARD, SELECT_SQUARE, PROMOTE_PAWN } from '../actions';
 
 const createInitialState = () => {
   const board = createInitialBoard();
+  const history = [{
+    move: 'Start',
+    board,
+  }];
+
   const pieces = {
     white: [],
     black: [],
@@ -23,17 +28,15 @@ const createInitialState = () => {
     pieces,
     selectedSquare: null,
     validMoveSquares: [],
+    allValidMoveSquares: getValidMovesForAllPlayersPieces(board, history, 'white', true),
     currentPlayer: 'white',
-    history: [{
-      move: 'Start',
-      board,
-    }],
+    history,
   };
 };
 
 const boardState = (state = createInitialState(), action) => {
-  const { board, pieces, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history } = state;
-  const newState = { board: cloneBoard(board), pieces, selectedSquare, validMoveSquares, currentPlayer, isCheck, isCheckmate, history };
+  const { board, pieces, selectedSquare, validMoveSquares, allValidMoveSquares, currentPlayer, isCheck, isCheckmate, history } = state;
+  const newState = { board: cloneBoard(board), pieces, selectedSquare, validMoveSquares, allValidMoveSquares, currentPlayer, isCheck, isCheckmate, history };
 
   switch (action.type) {
     case INITIALIZE_BOARD:
@@ -93,6 +96,7 @@ const boardState = (state = createInitialState(), action) => {
             newState.squareToPromote = newState.board[square.fileIndex][square.rankIndex];
           } else {
             newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+            newState.allValidMoveSquares = getValidMovesForAllPlayersPieces(newState.board, newState.history, newState.currentPlayer, true);
           }
         }
       } else if (square.piece && currentPlayer === square.piece.player) {
@@ -120,6 +124,7 @@ const boardState = (state = createInitialState(), action) => {
 
       // Switch to the next player
       newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+      newState.allValidMoveSquares = getValidMovesForAllPlayersPieces(newState.board, newState.history, newState.currentPlayer, true);
       break;
     }
     default:

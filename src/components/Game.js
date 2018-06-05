@@ -10,6 +10,7 @@ class Game extends Component {
       board,
       selectedSquare,
       validMoveSquares,
+      allValidMoveSquares,
       currentPlayer,
       isCheck,
       isCheckmate,
@@ -32,6 +33,7 @@ class Game extends Component {
               isCheckmate={ isCheckmate }
               onSelectSquare={ onSelectSquare }
               validMoveSquares={ validMoveSquares }
+              allValidMoveSquares={ allValidMoveSquares }
             />
             <History
               className="historyComponent"

@@ -24,6 +24,7 @@ class Board extends Component {
       currentPlayer,
       isCheck,
       isCheckmate,
+      allValidMoveSquares,
       onSelectSquare,
     } = this.props;
     let counter = 0;
@@ -43,6 +44,12 @@ class Board extends Component {
                       isChecked={ isCheck && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
                       isCheckmated={ isCheckmate && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
                       isHighlighted={ this.isValidMoveSquare(square) }
+                      isHidden={
+                        !(
+                          allValidMoveSquares.find(validMove => validMove.destinationFileIndex === square.fileIndex && validMove.destinationRankIndex === square.rankIndex) ||
+                          (square.piece && square.piece.player === currentPlayer)
+                        )
+                      }
                       onSelectSquare={ () => onSelectSquare(board, selectedSquare, square, currentPlayer) }
                     />
                   </div>

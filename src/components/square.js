@@ -16,6 +16,7 @@ const Square = ({
   isChecked,
   isCheckmated,
   isHighlighted,
+  isHidden,
   onSelectSquare,
 }) => {
   const icon = piece ? getPieceImage(piece) : null;
@@ -31,12 +32,13 @@ const Square = ({
           'highlighted': isHighlighted,
           'checked': isChecked,
           'checkmated': isCheckmated,
+          'hidden': isHidden,
         }
       ) }
       onClick={ onSelectSquare }
     >
       {
-        piece &&
+        piece && !isHidden &&
         <img className="piece" title={ _.startCase(piece.type) } alt={ piece.player + '.' + piece.type } src={ icon } />
       }
     </span>
