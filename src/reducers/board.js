@@ -1,5 +1,5 @@
 import { createInitialBoard } from '../utils/boardCreationUtils';
-import { cloneBoard, getValidMovesForAllPlayersPieces } from '../utils/boardUtils';
+import { cloneBoard, getValidMovesForAllPlayersPieces, getPlayersKingSquare } from '../utils/boardUtils';
 import { promotePawn } from '../utils/pieceUtils';
 import { parseAlgebraicNotation } from '../utils/algebraicNotation';
 
@@ -42,7 +42,9 @@ const boardState = (state = createInitialState(), action) => {
     case INITIALIZE_BOARD:
       return createInitialState();
     case SELECT_SQUARE: {
-      if (isCheckmate) {
+      const opponentsKingSquare = getPlayersKingSquare(newState.board, currentPlayer);
+      if (!opponentsKingSquare) {
+        // Opponent's king has been captured
         break;
       }
 
