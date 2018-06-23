@@ -5,29 +5,22 @@ import {
   RIGHT,
   DOWN,
   getValidMovesInDirections,
-  getValidMovesForAllPlayersPieces,
 } from '../../utils/boardUtils';
-import { parseAlgebraicNotation, writeAlgebraicNotation } from '../../utils/algebraicNotation';
+import { writeAlgebraicNotation } from '../../utils/algebraicNotation';
 
 export default class King extends Piece {
   constructor(player) {
     super('king', player);
   }
 
-  canCastle(withQueenSideRook, board, history) {
+  canCastle(withQueenSideRook, board) {
     // Castling Requirements: https://en.wikipedia.org/wiki/Castling#Requirements
 
     if (this.hasMoved) {
       return false; // Cannot castle if king has already moved (1, 2)
     }
 
-    if (history.length > 1) {
-      const lastMove = history.slice().pop();
-      const moveInfo = parseAlgebraicNotation(lastMove.move);
-      if (moveInfo.isCheck) {
-        return false; // Cannot castle when king is in check (4)
-      }
-    }
+    // Allow castling when king is in check (/4)
 
     const kingFileIndex = 4;
     const kingRankIndex = this.player === 'white' ? 7 : 0;
@@ -45,14 +38,8 @@ export default class King extends Piece {
       }
     }
 
-    const opponentsValidMoves = getValidMovesForAllPlayersPieces(board, history, this.player === 'white' ? 'black' : 'white');
-    return !opponentsValidMoves.some(({ destinationFileIndex, destinationRankIndex }) => (
-      // Cannot castle if the king moves through or lands on a square that's in check (5, 6)
-      destinationRankIndex === kingRankIndex && (
-        destinationFileIndex === kingFileIndex + (withQueenSideRook ? -1 : 1) ||
-        destinationFileIndex === kingFileIndex + (withQueenSideRook ? -2 : 2)
-      )
-    ));
+    // Allow castling if the king moves through or lands on a square that's in check (/5, /6)
+    return true;
   }
 
   getOptimisticValidMoves(board, position, history, isOfficialRequest) {

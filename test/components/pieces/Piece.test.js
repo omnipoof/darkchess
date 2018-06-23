@@ -38,7 +38,7 @@ describe('Board > Piece', () => {
     }
   });
 
-  it('Test filtering valid moves if they will create a check state', () => {
+  it('Test not filtering valid moves if they will create a check state', () => {
     const board = createBoard([
       '...Ba1',
       'Kh8',
@@ -48,7 +48,7 @@ describe('Board > Piece', () => {
     let validMoves = originSquare.piece.getValidMoves(board, originSquare, [], false);
     expect(validMoves.length).toBe(2);
     validMoves = originSquare.piece.getValidMoves(board, originSquare, [], true);
-    expect(validMoves.length).toBe(0);
+    expect(validMoves.length).toBe(2);
   });
 
   it('Test moving piece', () => {

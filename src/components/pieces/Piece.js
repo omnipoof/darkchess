@@ -2,7 +2,6 @@ import ObjectID from 'bson-objectid';
 import { writeAlgebraicNotation } from '../../utils/algebraicNotation';
 import {
   isPlayersKingInCheck,
-  isPlayersKingInCheckAfterMove,
   isPlayersKingCheckmated,
   determineFileRankAmbiguity,
 } from '../../utils/boardUtils';
@@ -29,21 +28,8 @@ class Piece {
   }
 
   getValidMoves(board, originSquare, history, isOfficialRequest) {
-    let validMoves = this.getOptimisticValidMoves(board, originSquare, history, isOfficialRequest);
-    if (isOfficialRequest) {
-      validMoves = validMoves.filter((validMove) => (
-        !isPlayersKingInCheckAfterMove(
-          validMove.originFileIndex,
-          validMove.originRankIndex,
-          validMove.destinationFileIndex,
-          validMove.destinationRankIndex,
-          board,
-          history,
-          this.player
-        )
-      ));
-    }
-    return validMoves;
+    // Do not filter valid moves if the king is in check
+    return this.getOptimisticValidMoves(board, originSquare, history, isOfficialRequest);
   }
 
   move(board, originSquare, destinationSquare, history, isOfficialMove) {

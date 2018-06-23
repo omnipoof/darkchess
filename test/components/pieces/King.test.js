@@ -91,7 +91,7 @@ describe('Board > Piece > King', () => {
     expect(validMoves.length).toBe(3);
   });
 
-  it('Test preventing castling due to check state', () => {
+  it('Test allowing castling despite check state', () => {
     const board = createInitialBoard();
     const moveResults = performMoves(board, [
       'g2g3',
@@ -106,10 +106,10 @@ describe('Board > Piece > King', () => {
     const originSquare = updatedBoard[4][7];
     const king = originSquare.piece;
     const validMoves = king.getValidMoves(updatedBoard, originSquare, moveResults.history, true);
-    expect(validMoves.length).toBe(1);
+    expect(validMoves.length).toBe(2);
   });
 
-  it('Test preventing kingside castling due to king passing through checked square', () => {
+  it('Test allowing kingside castling despite king passing through checked square', () => {
     const board = createInitialBoard();
     const moveResults = performMoves(board, [
       'g2g3',
@@ -126,10 +126,10 @@ describe('Board > Piece > King', () => {
     const originSquare = updatedBoard[4][7];
     const king = originSquare.piece;
     const validMoves = king.getValidMoves(updatedBoard, originSquare, moveResults.history, true);
-    expect(validMoves.length).toBe(0);
+    expect(validMoves.length).toBe(2);
   });
 
-  it('Test preventing queenside castling due to king passing through checked square', () => {
+  it('Test allowing queenside castling despite king passing through checked square', () => {
     const board = createInitialBoard();
     const moveResults = performMoves(board, [
       'e2e4',
@@ -152,10 +152,10 @@ describe('Board > Piece > King', () => {
     const originSquare = updatedBoard[4][7];
     const king = originSquare.piece;
     const validMoves = king.getValidMoves(updatedBoard, originSquare, moveResults.history, true);
-    expect(validMoves.length).toBe(2);
+    expect(validMoves.length).toBe(5);
   });
 
-  it('Test preventing kingside castling due to king ending on checked square', () => {
+  it('Test allowing kingside castling despite king ending on checked square', () => {
     const board = createInitialBoard();
     const moveResults = performMoves(board, [
       'g2g3',
@@ -172,10 +172,10 @@ describe('Board > Piece > King', () => {
     const originSquare = updatedBoard[4][7];
     const king = originSquare.piece;
     const validMoves = king.getValidMoves(updatedBoard, originSquare, moveResults.history, true);
-    expect(validMoves.length).toBe(1);
+    expect(validMoves.length).toBe(2);
   });
 
-  it('Test preventing queenside castling due to king ending on checked square', () => {
+  it('Test allowing queenside castling despite king ending on checked square', () => {
     const board = createInitialBoard();
     const moveResults = performMoves(board, [
       'c2c4',
@@ -196,7 +196,7 @@ describe('Board > Piece > King', () => {
     const originSquare = updatedBoard[4][7];
     const king = originSquare.piece;
     const validMoves = king.getValidMoves(updatedBoard, originSquare, moveResults.history, true);
-    expect(validMoves.length).toBe(2);
+    expect(validMoves.length).toBe(3);
   });
 
   it('Test preventing castling due to king having already moved', () => {
