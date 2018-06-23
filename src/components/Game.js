@@ -38,6 +38,7 @@ class Game extends Component {
             <History
               className="historyComponent"
               history={ history }
+              currentPlayer={ currentPlayer }
             />
           </div>
         </div>

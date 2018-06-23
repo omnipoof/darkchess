@@ -5,7 +5,7 @@ import './History.css';
 
 export default class History extends Component {
   render() {
-    const { className, history } = this.props;
+    const { className, history, currentPlayer } = this.props;
 
     let roundNum = 1;
     const historyElements = history.reduce((memo, value, index) => {
@@ -13,7 +13,7 @@ export default class History extends Component {
       if (index === 0) {
         memo.push(<span className="move start">{ move }</span>);
       } else if (index % 2) {
-        const entry = `${ move }`;
+        const entry = `${ currentPlayer === 'white' ? move : '?' }`;
         memo.push([
           <span className="round">{ `${ roundNum }.` }</span>,
           <span className="move">{ entry }</span>,
@@ -22,7 +22,7 @@ export default class History extends Component {
       } else {
         const entry = memo.pop();
         entry.pop(); // Remove placeholder
-        entry.push(<span className="move">{ ` ${ move }` }</span>);
+        entry.push(<span className="move">{ ` ${ currentPlayer === 'white' ? '?' : move }` }</span>);
         memo.push(entry);
         roundNum += 1;
       }
