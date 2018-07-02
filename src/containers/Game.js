@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { selectSquare, promotePawn } from '../actions';
+import { selectSquare, endTurn, startTurn, promotePawn } from '../actions';
 import GameComponent from '../components/Game';
 
 const mapStateToProps = (state) => {
@@ -11,6 +11,8 @@ const mapStateToProps = (state) => {
       validMoveSquares,
       allValidMoveSquares,
       currentPlayer,
+      hasMoved,
+      hasEndedTurn,
       isCheck,
       isCheckmate,
       squareToPromote,
@@ -25,6 +27,8 @@ const mapStateToProps = (state) => {
     validMoveSquares,
     allValidMoveSquares,
     currentPlayer,
+    hasMoved,
+    hasEndedTurn,
     isCheck,
     isCheckmate,
     squareToPromote,
@@ -36,6 +40,14 @@ const mapDispatchToProps = (dispatch) => {
   return {
     onSelectSquare: (board, previousSelectedSquare, square, currentPlayer) => {
       dispatch(selectSquare(board, previousSelectedSquare, square, currentPlayer));
+    },
+
+    onEndTurn: () => {
+      dispatch(endTurn());
+    },
+
+    onStartTurn: () => {
+      dispatch(startTurn());
     },
 
     promotePawn: (square, pieceType) => {

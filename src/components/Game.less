@@ -25,8 +25,25 @@
         max-height: ~"calc(100vh - 15px)";
       }
 
-      .historyComponent {
-        margin-left: 5px;
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .turnButton {
+          font-family: 'Palanquin';
+          font-size: 20px;
+          font-weight: 700;
+          border: 2px solid black;
+          width: 274px;
+          height: 50px;
+          margin-left: 5px;
+          margin-bottom: 5px;
+        }
+
+        .historyComponent {
+          margin-left: 5px;
+        }
       }
 
       .information {
@@ -44,8 +61,18 @@
       .core {
         flex-direction: column;
 
-        .historyComponent {
+        .sidebar {
           margin: 5px 0 0 0;
+
+          .turnButton {
+            width: ~"calc(100vw - 11px)";
+            max-width: ~"calc(100vh - 11px)";
+            margin: 0;
+          }
+
+          .historyComponent {
+            margin: 5px 0 0 0;
+          }
         }
       }
     }

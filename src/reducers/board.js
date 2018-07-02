@@ -3,7 +3,7 @@ import { cloneBoard, getValidMovesForAllPlayersPieces, getPlayersKingSquare } fr
 import { promotePawn } from '../utils/pieceUtils';
 import { parseAlgebraicNotation } from '../utils/algebraicNotation';
 
-import { INITIALIZE_BOARD, SELECT_SQUARE, PROMOTE_PAWN } from '../actions';
+import { INITIALIZE_BOARD, SELECT_SQUARE, END_TURN, START_TURN, PROMOTE_PAWN } from '../actions';
 
 const createInitialState = () => {
   const board = createInitialBoard();
@@ -30,18 +30,24 @@ const createInitialState = () => {
     validMoveSquares: [],
     allValidMoveSquares: getValidMovesForAllPlayersPieces(board, history, 'white', true),
     currentPlayer: 'white',
+    hasMoved: false,
     history,
   };
 };
 
 const boardState = (state = createInitialState(), action) => {
-  const { board, pieces, selectedSquare, validMoveSquares, allValidMoveSquares, currentPlayer, isCheck, isCheckmate, history } = state;
-  const newState = { board: cloneBoard(board), pieces, selectedSquare, validMoveSquares, allValidMoveSquares, currentPlayer, isCheck, isCheckmate, history };
+  const { board, pieces, selectedSquare, validMoveSquares, allValidMoveSquares, currentPlayer, hasMoved, hasEndedTurn, isCheck, isCheckmate, history } = state;
+  const newState = { board: cloneBoard(board), pieces, selectedSquare, validMoveSquares, allValidMoveSquares, currentPlayer, hasMoved, hasEndedTurn, isCheck, isCheckmate, history };
 
   switch (action.type) {
     case INITIALIZE_BOARD:
       return createInitialState();
     case SELECT_SQUARE: {
+      if (hasMoved) {
+        // Viewing the board after moving a piece and waiting for the turn to end
+        break;
+      }
+
       const opponentsKingSquare = getPlayersKingSquare(newState.board, currentPlayer);
       if (!opponentsKingSquare) {
         // Opponent's king has been captured
@@ -97,8 +103,8 @@ const boardState = (state = createInitialState(), action) => {
           ) {
             newState.squareToPromote = newState.board[square.fileIndex][square.rankIndex];
           } else {
-            newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
             newState.allValidMoveSquares = getValidMovesForAllPlayersPieces(newState.board, newState.history, newState.currentPlayer, true);
+            newState.hasMoved = true;
           }
         }
       } else if (square.piece && currentPlayer === square.piece.player) {
@@ -106,6 +112,18 @@ const boardState = (state = createInitialState(), action) => {
         newState.validMoveSquares = getValidMovesFromSquare(board, square, history);
       }
 
+      break;
+    }
+    case END_TURN: {
+      newState.hasEndedTurn = true;
+      break;
+    }
+    case START_TURN: {
+      // Switch to the next player
+      newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+      newState.allValidMoveSquares = getValidMovesForAllPlayersPieces(newState.board, newState.history, newState.currentPlayer, true);
+      newState.hasMoved = false;
+      newState.hasEndedTurn = false;
       break;
     }
     case PROMOTE_PAWN: {
@@ -123,10 +141,8 @@ const boardState = (state = createInitialState(), action) => {
       const moveInfo = parseAlgebraicNotation(algebraicNotation);
       newState.isCheck = moveInfo.isCheck;
       newState.isCheckmate = moveInfo.isCheckmate;
-
-      // Switch to the next player
-      newState.currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
       newState.allValidMoveSquares = getValidMovesForAllPlayersPieces(newState.board, newState.history, newState.currentPlayer, true);
+      newState.hasMoved = true;
       break;
     }
     default:

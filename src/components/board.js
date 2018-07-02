@@ -22,6 +22,7 @@ class Board extends Component {
       board,
       selectedSquare,
       currentPlayer,
+      hasEndedTurn,
       isCheck,
       isCheckmate,
       allValidMoveSquares,
@@ -45,6 +46,7 @@ class Board extends Component {
                       isCheckmated={ isCheckmate && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
                       isHighlighted={ this.isValidMoveSquare(square) }
                       isHidden={
+                        hasEndedTurn ||
                         !(
                           allValidMoveSquares.find(validMove => validMove.destinationFileIndex === square.fileIndex && validMove.destinationRankIndex === square.rankIndex) ||
                           (square.piece && square.piece.player === currentPlayer)

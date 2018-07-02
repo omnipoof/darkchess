@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import PawnPromotionDialog from './PawnPromotionDialog';
-import './Game.css';
 import Board from './Board';
 import History from './History';
+import PawnPromotionDialog from './PawnPromotionDialog';
+import './Game.css';
 
 class Game extends Component {
   render() {
@@ -12,10 +12,14 @@ class Game extends Component {
       validMoveSquares,
       allValidMoveSquares,
       currentPlayer,
+      hasMoved,
+      hasEndedTurn,
       isCheck,
       isCheckmate,
       squareToPromote,
       onSelectSquare,
+      onEndTurn,
+      onStartTurn,
       promotePawn,
       history,
     } = this.props;
@@ -29,17 +33,28 @@ class Game extends Component {
               board={ board }
               selectedSquare={ selectedSquare }
               currentPlayer={ currentPlayer }
+              hasEndedTurn={ hasEndedTurn }
               isCheck={ isCheck }
               isCheckmate={ isCheckmate }
               onSelectSquare={ onSelectSquare }
               validMoveSquares={ validMoveSquares }
               allValidMoveSquares={ allValidMoveSquares }
             />
-            <History
-              className="historyComponent"
-              history={ history }
-              currentPlayer={ currentPlayer }
-            />
+            <div className="sidebar">
+              <input
+                className="turnButton"
+                type="button"
+                disabled={ !hasMoved }
+                value={ !hasEndedTurn ? 'End Turn' : 'Start Turn' }
+                onClick={ !hasEndedTurn ? onEndTurn : onStartTurn }
+              />
+              <History
+                className="historyComponent"
+                history={ history }
+                currentPlayer={ currentPlayer }
+                hasEndedTurn={ hasEndedTurn }
+              />
+            </div>
           </div>
         </div>
         <PawnPromotionDialog
