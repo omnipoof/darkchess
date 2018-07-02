@@ -25,6 +25,7 @@ class Board extends Component {
       hasEndedTurn,
       isCheck,
       isCheckmate,
+      threatenedKingColor,
       allValidMoveSquares,
       onSelectSquare,
     } = this.props;
@@ -42,8 +43,8 @@ class Board extends Component {
                       key={counter++}
                       square={ square }
                       isSelected={ selectedSquare && square.fileIndex === selectedSquare.fileIndex && square.rankIndex === selectedSquare.rankIndex }
-                      isChecked={ isCheck && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
-                      isCheckmated={ isCheckmate && square.piece && square.piece.type === 'king' && square.piece.player === currentPlayer }
+                      isChecked={ isCheck && square.piece && square.piece.type === 'king' && square.piece.player === threatenedKingColor }
+                      isCheckmated={ isCheckmate && square.piece && square.piece.type === 'king' && square.piece.player === threatenedKingColor }
                       isHighlighted={ this.isValidMoveSquare(square) }
                       isHidden={
                         hasEndedTurn ||

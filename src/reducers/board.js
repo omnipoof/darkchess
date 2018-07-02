@@ -36,8 +36,8 @@ const createInitialState = () => {
 };
 
 const boardState = (state = createInitialState(), action) => {
-  const { board, pieces, selectedSquare, validMoveSquares, allValidMoveSquares, currentPlayer, hasMoved, hasEndedTurn, isCheck, isCheckmate, history } = state;
-  const newState = { board: cloneBoard(board), pieces, selectedSquare, validMoveSquares, allValidMoveSquares, currentPlayer, hasMoved, hasEndedTurn, isCheck, isCheckmate, history };
+  const { board, pieces, selectedSquare, validMoveSquares, allValidMoveSquares, currentPlayer, hasMoved, hasEndedTurn, isCheck, isCheckmate, threatenedKingColor, history } = state;
+  const newState = { board: cloneBoard(board), pieces, selectedSquare, validMoveSquares, allValidMoveSquares, currentPlayer, hasMoved, hasEndedTurn, isCheck, isCheckmate, threatenedKingColor, history };
 
   switch (action.type) {
     case INITIALIZE_BOARD:
@@ -83,6 +83,7 @@ const boardState = (state = createInitialState(), action) => {
           newState.validMoveSquares = [];
           newState.isCheck = moveInfo.isCheck;
           newState.isCheckmate = moveInfo.isCheckmate;
+          newState.threatenedKingColor = (moveInfo.isCheck || moveInfo.isCheckmate) && moveInfo.player === 'white' ? 'black' : 'white';
           newState.history.push({
             move: moveInfo.algebraicNotation,
             board: newState.board,
@@ -141,6 +142,7 @@ const boardState = (state = createInitialState(), action) => {
       const moveInfo = parseAlgebraicNotation(algebraicNotation);
       newState.isCheck = moveInfo.isCheck;
       newState.isCheckmate = moveInfo.isCheckmate;
+      newState.threatenedKingColor = (moveInfo.isCheck || moveInfo.isCheckmate) && moveInfo.player === 'white' ? 'black' : 'white';
       newState.allValidMoveSquares = getValidMovesForAllPlayersPieces(newState.board, newState.history, newState.currentPlayer, true);
       newState.hasMoved = true;
       break;

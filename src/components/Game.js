@@ -16,6 +16,7 @@ class Game extends Component {
       hasEndedTurn,
       isCheck,
       isCheckmate,
+      threatenedKingColor,
       squareToPromote,
       onSelectSquare,
       onEndTurn,
@@ -36,13 +37,14 @@ class Game extends Component {
               hasEndedTurn={ hasEndedTurn }
               isCheck={ isCheck }
               isCheckmate={ isCheckmate }
+              threatenedKingColor={ threatenedKingColor }
               onSelectSquare={ onSelectSquare }
               validMoveSquares={ validMoveSquares }
               allValidMoveSquares={ allValidMoveSquares }
             />
             <div className="sidebar">
               <input
-                className="turnButton"
+                className={ `turnButton ${ !hasMoved ? 'disabled' : '' }` }
                 type="button"
                 disabled={ !hasMoved }
                 value={ !hasEndedTurn ? 'End Turn' : 'Start Turn' }

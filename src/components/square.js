@@ -30,8 +30,8 @@ const Square = ({
         {
           'selected': isSelected,
           'highlighted': isHighlighted,
-          'checked': isChecked,
-          'checkmated': isCheckmated,
+          'checked': !isHidden && isChecked,
+          'checkmated': !isHidden && isCheckmated,
           'hidden': isHidden,
         }
       ) }

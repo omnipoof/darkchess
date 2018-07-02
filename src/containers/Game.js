@@ -15,6 +15,7 @@ const mapStateToProps = (state) => {
       hasEndedTurn,
       isCheck,
       isCheckmate,
+      threatenedKingColor,
       squareToPromote,
       history,
     },
@@ -31,6 +32,7 @@ const mapStateToProps = (state) => {
     hasEndedTurn,
     isCheck,
     isCheckmate,
+    threatenedKingColor,
     squareToPromote,
     history,
   };
